@@ -5,11 +5,14 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import { Subscription, map, timer } from 'rxjs';
 
 @Component({
   selector: 'app-header',
   standalone: true,
   imports: [
+    CommonModule,
     MatToolbarModule,
     MatButtonModule,
     MatIconModule,
@@ -22,6 +25,11 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
 })
 export class HeaderComponent implements OnInit {
   toogleControl = new FormControl(true);
+  currentTime = new Date();
+  currentUTCTime = new Date(
+    this.currentTime.getTime() + this.currentTime.getTimezoneOffset() * 60000
+  );
+  subscription: Subscription = new Subscription();
 
   ngOnInit(): void {
     const body = document.getElementsByTagName('body')[0];
@@ -29,5 +37,14 @@ export class HeaderComponent implements OnInit {
     this.toogleControl.valueChanges.subscribe((darkMode) => {
       body.classList.toggle('darkMode', darkMode!);
     });
+
+    this.subscription = timer(0, 1000)
+      .pipe(map(() => new Date()))
+      .subscribe((time) => {
+        this.currentTime = time;
+        this.currentUTCTime = new Date(
+          time.getTime() + time.getTimezoneOffset() * 60000
+        );
+      });
   }
 }

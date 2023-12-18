@@ -1,29 +1,24 @@
-<p>
-  <mat-toolbar color="primary">
-    <mat-toolbar-row>
-      <a mat-button class="companyName" routerLink="/">
-        <span>EdPlanes</span>
-      </a>
-      <span class="spacer"></span>
-      <small>
-        hi, <a mat-button routerLink="/profiles/:id">Kacper | PFF003</a>
-      </small>
-    </mat-toolbar-row>
-    <mat-toolbar-row>
-      <div fxShow="true" fxHide.gt-sm="true">
-        <button mat-icon-button aria-label="menu control">
-          <mat-icon>menu</mat-icon>
-        </button>
-      </div>
-      <div fxShow="true" fxHide.lt-md="true">
-        <a mat-button routerLink="/">Dashboard</a>
-      </div>
-      <span class="spacer"></span>
-      <mat-icon class="mr-8">brightness_5</mat-icon>
-      <mat-slide-toggle [formControl]="toogleControl" class="mr-8">
-      </mat-slide-toggle>
-      <mat-icon>bedtime</mat-icon>
-    </mat-toolbar-row>
-  </mat-toolbar>
-</p>
-
+<mat-toolbar color="primary">
+  <mat-toolbar-row>
+    <a mat-button class="companyName" routerLink="/">
+      <span>EdPlanes</span>
+    </a>
+    <span class="spacer"></span>
+    <div fxHide.lt-sm="true">
+      <mat-icon>access_time</mat-icon>&nbsp;{{
+        currentUTCTime | date : "HH:mm"
+      }}&nbsp;zulu
+    </div>
+    <span class="spacer"></span>
+    <div fxHide.lt-sm="true">
+      <mat-icon>access_time</mat-icon>&nbsp;
+      {{ currentTime | date : "HH:mm" }}&nbsp; local
+    </div>
+    <span class="spacer"></span>
+    <mat-icon class="mr-8">brightness_5</mat-icon>
+    <mat-slide-toggle [formControl]="toogleControl" class="mr-8">
+    </mat-slide-toggle>
+    <mat-icon>bedtime</mat-icon>
+  </mat-toolbar-row>
+  <mat-toolbar-row></mat-toolbar-row>
+</mat-toolbar>
