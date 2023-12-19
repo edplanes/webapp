@@ -19,7 +19,7 @@ $light-theme: mat.define-light-theme((color: (primary: mat.define-palette(mat.$i
 @include mat.all-component-themes($light-theme);
 
 .darkMode {
-  @include mat.all-component-themes($dark-theme);
+  @include mat.all-component-colors($dark-theme);
 }
 
 html, body { height: 100%; }

@@ -1,17 +1,25 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { Observable, first } from 'rxjs';
+import { Injectable, inject } from '@angular/core';
+import { Observable, first, map } from 'rxjs';
 import { IAuthInfo } from '../../models/auth.model';
+import { ConfigService } from '../config/config.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
 
-  constructor(private http: HttpClient) { }
+  protected apiServer = "";
+
+  constructor(private http: HttpClient) {
+    inject(ConfigService).state$.pipe(
+      first(config => config.isLoaded),
+      map(({ data }) => data)
+    ).subscribe(config => this.apiServer = config?.apiServer!)
+  }
 
   login(username: string, password: string) {
-    return this.http.post("http://localhost:8080/api/auth", null, {
+    return this.http.post(`${this.apiServer}/api/auth`, null, {
       headers: {
         "Authorization": `Basic ${window.btoa(`${username}:${password}`)}`
       },
@@ -38,7 +46,7 @@ export class AuthService {
   private setSession(authResult: IAuthInfo) {
     localStorage.setItem('id_token', authResult.token)
     localStorage.setItem('expires_at', JSON.stringify(authResult.expiresAt.valueOf()))
-    localStorage.setItem('user',JSON.stringify(authResult.payload))
+    localStorage.setItem('user', JSON.stringify(authResult.payload))
   }
 
   private getExpiration() {

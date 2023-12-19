@@ -1,0 +1,18 @@
+{
+  "env": {
+    "name": "#{envName}"
+  },
+  "appInsights": {
+    "instrumentationKey": "#{appInsightsKey}"
+  },
+  "logging": {
+    "console": true,
+    "appInsights": true
+  },
+  "aad": {
+    "requireAuth": true,
+    "tenant": "#{aadTenant}",
+    "clientId": "#{aadClientId}"
+  },
+  "apiServer": "https://#{apiServerFQDN}/"
+}

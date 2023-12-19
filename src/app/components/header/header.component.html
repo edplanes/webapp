@@ -20,5 +20,5 @@
     </mat-slide-toggle>
     <mat-icon>bedtime</mat-icon>
   </mat-toolbar-row>
-  <mat-toolbar-row></mat-toolbar-row>
+  <mat-toolbar-row *ngIf="!isHeadless"> </mat-toolbar-row>
 </mat-toolbar>

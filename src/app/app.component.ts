@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, NgZone, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterOutlet } from '@angular/router';
+import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { HeaderComponent } from './components/header/header.component';
+import { filter } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -10,6 +11,20 @@ import { HeaderComponent } from './components/header/header.component';
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
 })
-export class AppComponent {
-  title = 'webapp';
+export class AppComponent implements OnInit {
+  isHeadless = false
+
+  constructor(private router: Router) { }
+
+  ngOnInit(): void {
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe(event =>
+      this.isHeadless = !!(<NavigationEnd>event).url.match(
+        /(login|register)$/
+      )
+    )
+  }
+
+
 }
