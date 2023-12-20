@@ -27,9 +27,9 @@ export class ConfigService {
   public load(): Observable<Config> {
     const jsonFile = `assets/config/config.${environment.name}.json`;
     return this.http.get<Config>(jsonFile).pipe(
-      tap((config) => {
+      tap(config => {
         this.state.next({ isLoaded: true, data: config });
-      }),
+      })
     );
   }
 }

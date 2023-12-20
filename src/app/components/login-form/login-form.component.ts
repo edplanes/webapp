@@ -38,7 +38,7 @@ export class LoginFormComponent {
     private fb: FormBuilder,
     private authService: AuthService,
     private router: Router,
-    private route: ActivatedRoute,
+    private route: ActivatedRoute
   ) {
     this.form = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -49,7 +49,7 @@ export class LoginFormComponent {
   onSubmit() {
     this.errors = [];
     if (!this.form.valid) {
-      Object.keys(this.form.controls).forEach((key) => {
+      Object.keys(this.form.controls).forEach(key => {
         const errs = this.form.controls[key].errors;
         if (errs!['required']) this.errors?.push(errorMessages.required(key));
         if (errs!['email']) this.errors?.push(errorMessages.email());

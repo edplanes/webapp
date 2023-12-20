@@ -10,16 +10,16 @@ import { ConfigService } from '../config/config.service';
 export class AuthService implements OnDestroy {
   protected apiServer = '';
   private authSub: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(
-    false,
+    false
   );
 
   constructor(private http: HttpClient) {
     inject(ConfigService)
       .state$.pipe(
-        first((config) => config.isLoaded),
-        map(({ data }) => data),
+        first(config => config.isLoaded),
+        map(({ data }) => data)
       )
-      .subscribe((config) => (this.apiServer = config?.apiServer || ''));
+      .subscribe(config => (this.apiServer = config?.apiServer || ''));
   }
 
   ngOnDestroy(): void {
@@ -34,10 +34,10 @@ export class AuthService implements OnDestroy {
         },
       })
       .pipe(
-        first((res) => {
+        first(res => {
           this.setSession(<IAuthInfo>res);
           return true;
-        }),
+        })
       );
   }
 
@@ -59,7 +59,7 @@ export class AuthService implements OnDestroy {
     localStorage.setItem('id_token', authResult.token);
     localStorage.setItem(
       'expires_at',
-      JSON.stringify(authResult.expiresAt.valueOf()),
+      JSON.stringify(authResult.expiresAt.valueOf())
     );
     localStorage.setItem('user', JSON.stringify(authResult.payload));
   }

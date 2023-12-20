@@ -28,23 +28,23 @@ export class HeaderComponent implements OnInit {
   toogleControl = new FormControl(true);
   currentTime = new Date();
   currentUTCTime = new Date(
-    this.currentTime.getTime() + this.currentTime.getTimezoneOffset() * 60000,
+    this.currentTime.getTime() + this.currentTime.getTimezoneOffset() * 60000
   );
   subscription: Subscription = new Subscription();
 
   ngOnInit(): void {
     const body = document.getElementsByTagName('body')[0];
     body.classList.toggle('darkMode', this.toogleControl.value!);
-    this.toogleControl.valueChanges.subscribe((darkMode) => {
+    this.toogleControl.valueChanges.subscribe(darkMode => {
       body.classList.toggle('darkMode', darkMode!);
     });
 
     this.subscription = timer(0, 1000)
       .pipe(map(() => new Date()))
-      .subscribe((time) => {
+      .subscribe(time => {
         this.currentTime = time;
         this.currentUTCTime = new Date(
-          time.getTime() + time.getTimezoneOffset() * 60000,
+          time.getTime() + time.getTimezoneOffset() * 60000
         );
       });
   }

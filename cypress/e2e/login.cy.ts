@@ -12,7 +12,7 @@ describe('Login Page', () => {
     cy.visit('/login');
     cy.get('button[type="submit"]').click();
     cy.wait(2000);
-    cy.get('@authRequest.all').then((interceptions) => {
+    cy.get('@authRequest.all').then(interceptions => {
       expect(interceptions).to.have.length(0);
     });
   });
@@ -34,9 +34,9 @@ describe('Login Page', () => {
       {
         hostname: 'localhost',
       },
-      (req) => {
+      req => {
         expect(req.headers['authorization']).contain(
-          'YWRtaW5AbG9jYWxob3N0LmNvbTphZG1pbg==',
+          'YWRtaW5AbG9jYWxob3N0LmNvbTphZG1pbg=='
         );
 
         req.reply(200, {
@@ -49,7 +49,7 @@ describe('Login Page', () => {
             email: 'admin@localhost.com',
           },
         });
-      },
+      }
     ).as('login');
     cy.visit('/login');
     cy.get('input[type="email"]').type('admin@localhost.com');
