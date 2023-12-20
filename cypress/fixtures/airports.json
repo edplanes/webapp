@@ -1,0 +1,57 @@
+[
+  {
+    "icao": "EPAR",
+    "city": "Bircza",
+    "location": {
+      "lat": 49.657501,
+      "lon": 22.514298,
+      "elev": 1455
+    },
+    "name": "Arłamów Airport",
+    "score": 3
+  },
+  {
+    "icao": "EPBA",
+    "city": "",
+    "location": {
+      "lat": 49.80500030517578,
+      "lon": 19.00189971923828,
+      "elev": 1319
+    },
+    "name": "Bielsko Biala Airport",
+    "score": 3
+  },
+  {
+    "icao": "EPBC",
+    "city": "",
+    "location": {
+      "lat": 52.26850128173828,
+      "lon": 20.910999298095703,
+      "elev": 352
+    },
+    "name": "Babice Airport",
+    "score": 3
+  },
+  {
+    "icao": "EPBK",
+    "city": "Białystok",
+    "location": {
+      "lat": 53.101398,
+      "lon": 23.170601,
+      "elev": 502
+    },
+    "name": "Białystok-Krywlany Airport",
+    "score": 3
+  },
+  {
+    "icao": "EPBO",
+    "city": "Czersk",
+    "location": {
+      "lat": 53.951942,
+      "lon": 17.942778,
+      "elev": 466
+    },
+    "name": "Borsk (former military)",
+    "score": 3
+  }
+]

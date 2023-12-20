@@ -6,16 +6,12 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
-
-const errorMessages = {
-  required: (key: string) => `Field ${key} is required!`,
-  email: () => `Email is invalid!`,
-};
+import { FlexLayoutModule } from '@angular/flex-layout';
 
 @Component({
   selector: 'app-login-form',
@@ -26,34 +22,27 @@ const errorMessages = {
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
+    FlexLayoutModule,
   ],
   templateUrl: './login-form.component.html',
   styleUrl: './login-form.component.scss',
 })
 export class LoginFormComponent {
   form: FormGroup;
-  errors: string[] = [];
 
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
-    private router: Router,
-    private route: ActivatedRoute
+    private router: Router
   ) {
     this.form = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
-      password: ['', Validators.required],
+      password: ['', [Validators.required, Validators.min(6)]],
     });
   }
 
   onSubmit() {
-    this.errors = [];
     if (!this.form.valid) {
-      Object.keys(this.form.controls).forEach(key => {
-        const errs = this.form.controls[key].errors;
-        if (errs!['required']) this.errors?.push(errorMessages.required(key));
-        if (errs!['email']) this.errors?.push(errorMessages.email());
-      });
       return;
     }
 

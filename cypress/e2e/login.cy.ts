@@ -2,7 +2,7 @@ describe('Login Page', () => {
   before(() => {
     cy.intercept('/assets/config/config.dev.json', {
       body: {
-        apiServer: 'http://localhost:8080',
+        apiServer: 'http://localhost:8080/api',
       },
     });
   });
@@ -56,6 +56,6 @@ describe('Login Page', () => {
     cy.get('input[type="password"]').type('admin');
     cy.get('button[type="submit"]').click();
     cy.wait('@login');
-    cy.url().should('match', /(http:\/\/|https:\/\/)?[^\/\?]+\/$/);
+    cy.url().should('match', /(http:\/\/|https:\/\/)?[^/?]+\/$/);
   });
 });

@@ -1,35 +1,36 @@
 <mat-card>
-  <mat-card-title>Login</mat-card-title>
+  <mat-card-header>
+    <mat-card-title>Login</mat-card-title>
+  </mat-card-header>
   <mat-card-content>
     <form [formGroup]="form" (ngSubmit)="onSubmit()">
-      <p>
-        <mat-form-field>
-          <input
-            type="email"
-            matInput
-            placeholder="Email"
-            formControlName="email" />
-        </mat-form-field>
-      </p>
-      <p>
-        <mat-form-field>
-          <input
-            type="password"
-            matInput
-            placeholder="Password"
-            formControlName="password" />
-        </mat-form-field>
-      </p>
-
-      @if (errors.length > 0) {
-        @for (error of errors; track $index) {
-          <mat-error>{{ error }}</mat-error>
+      <mat-form-field>
+        <input
+          type="email"
+          matInput
+          formControlName="email"
+          placeholder="Email" />
+        @if (form.getError('required', 'email')) {
+          <mat-error>Email is required</mat-error>
         }
-      }
-
-      <div class="button">
-        <button type="submit" mat-button>Login</button>
-      </div>
+        @if (form.getError('email', 'email')) {
+          <mat-error>Email is invalid</mat-error>
+        }
+      </mat-form-field>
+      <mat-form-field>
+        <input
+          type="password"
+          matInput
+          formControlName="password"
+          placeholder="Password" />
+        @if (form.getError('required', 'password')) {
+          <mat-error>Password is required</mat-error>
+        }
+      </mat-form-field>
+      <mat-card-actions fxLayout fxLayoutAlign="space-between center">
+        <button mat-stroked-button>Create New Account</button>
+        <button type="submit" mat-raised-button color="primary">Login</button>
+      </mat-card-actions>
     </form>
   </mat-card-content>
 </mat-card>

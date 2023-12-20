@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, OnDestroy, inject } from '@angular/core';
-import { BehaviorSubject, first, map } from 'rxjs';
+import { BehaviorSubject, Observable, first, map } from 'rxjs';
 import { IAuthInfo } from '../../models/auth.model';
 import { ConfigService } from '../config/config.service';
 
@@ -12,6 +12,9 @@ export class AuthService implements OnDestroy {
   private authSub: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(
     false
   );
+  public get isAuthenticated(): Observable<boolean> {
+    return this.authSub.asObservable();
+  }
 
   constructor(private http: HttpClient) {
     inject(ConfigService)
@@ -28,7 +31,7 @@ export class AuthService implements OnDestroy {
 
   login(username: string, password: string) {
     return this.http
-      .post(`${this.apiServer}/api/auth`, null, {
+      .post(`${this.apiServer}/auth`, null, {
         headers: {
           Authorization: `Basic ${window.btoa(`${username}:${password}`)}`,
         },
