@@ -138,11 +138,21 @@
               "devServerTarget": "webapp:serve:production"
             }
           }
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": ["src/**/*.ts", "src/**/*.html"]
+          }
         }
       }
     }
   },
   "cli": {
-    "schematicCollections": ["@schematics/angular", "@cypress/schematic"]
+    "schematicCollections": [
+      "@angular-eslint/schematics",
+      "@schematics/angular",
+      "@cypress/schematic"
+    ]
   }
 }

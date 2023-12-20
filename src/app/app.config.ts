@@ -8,18 +8,21 @@ import { AuthInterceptor } from './services/auth/auth.interceptor';
 import { ConfigService } from './services/config/config.service';
 
 export function initializeApp() {
-  const configService = inject(ConfigService)
+  const configService = inject(ConfigService);
 
   return () => configService.load();
 }
 
 export const appConfig: ApplicationConfig = {
-  providers: [provideRouter(routes), provideAnimations(), provideHttpClient(),
-  { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
-  {
-    provide: APP_INITIALIZER,
-    useFactory: initializeApp,
-    multi: true
-  }
-  ]
+  providers: [
+    provideRouter(routes),
+    provideAnimations(),
+    provideHttpClient(),
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
+    {
+      provide: APP_INITIALIZER,
+      useFactory: initializeApp,
+      multi: true,
+    },
+  ],
 };

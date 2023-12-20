@@ -11,6 +11,6 @@ export const routes: Routes = [
   {
     path: 'login',
     component: LoginComponent,
-    title: 'EdPlanes - LogIn'
-  }
+    title: 'EdPlanes - LogIn',
+  },
 ];

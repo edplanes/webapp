@@ -23,9 +23,11 @@
         </mat-form-field>
       </p>
 
-      @if (errors.length > 0) { @for (error of errors; track $index) {
-      <p class="error">{{ error }}</p>
-      } }
+      @if (errors.length > 0) {
+        @for (error of errors; track $index) {
+          <mat-error>{{ error }}</mat-error>
+        }
+      }
 
       <div class="button">
         <button type="submit" mat-button>Login</button>

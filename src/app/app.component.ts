@@ -1,4 +1,4 @@
-import { Component, NgZone, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { HeaderComponent } from './components/header/header.component';
@@ -12,19 +12,18 @@ import { filter } from 'rxjs';
   styleUrl: './app.component.scss',
 })
 export class AppComponent implements OnInit {
-  isHeadless = false
+  isHeadless = false;
 
-  constructor(private router: Router) { }
+  constructor(private router: Router) {}
 
   ngOnInit(): void {
-    this.router.events.pipe(
-      filter(event => event instanceof NavigationEnd)
-    ).subscribe(event =>
-      this.isHeadless = !!(<NavigationEnd>event).url.match(
-        /(login|register)$/
-      )
-    )
+    this.router.events
+      .pipe(filter((event) => event instanceof NavigationEnd))
+      .subscribe(
+        (event) =>
+          (this.isHeadless = !!(<NavigationEnd>event).url.match(
+            /(login|register)$/,
+          )),
+      );
   }
-
-
 }

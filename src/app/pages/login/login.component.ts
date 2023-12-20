@@ -6,8 +6,6 @@ import { LoginFormComponent } from '../../components/login-form/login-form.compo
   standalone: true,
   imports: [LoginFormComponent],
   templateUrl: './login.component.html',
-  styleUrl: './login.component.scss'
+  styleUrl: './login.component.scss',
 })
-export class LoginComponent {
-
-}
+export class LoginComponent {}

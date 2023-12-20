@@ -1,20 +1,28 @@
-@use '@angular/material' as mat;
+@use "@angular/material" as mat;
 
 @include mat.core();
 
-$dark-theme: mat.define-dark-theme((color: (primary: mat.define-palette(mat.$pink-palette),
-        accent: mat.define-palette(mat.$blue-grey-palette),
-      ),
-      // Only include `typography` and `density` in the default dark theme.
-      typography: mat.define-typography-config(),
-      density: 0,
-    ));
+$dark-theme: mat.define-dark-theme(
+  (
+    color: (
+      primary: mat.define-palette(mat.$pink-palette),
+      accent: mat.define-palette(mat.$blue-grey-palette),
+    ),
+    // Only include `typography` and `density` in the default dark theme.
+    typography: mat.define-typography-config(),
+    density: 0,
+  )
+);
 
 // Define a light theme
-$light-theme: mat.define-light-theme((color: (primary: mat.define-palette(mat.$indigo-palette),
-        accent: mat.define-palette(mat.$pink-palette),
-      ),
-    ));
+$light-theme: mat.define-light-theme(
+  (
+    color: (
+      primary: mat.define-palette(mat.$indigo-palette),
+      accent: mat.define-palette(mat.$pink-palette),
+    ),
+  )
+);
 
 @include mat.all-component-themes($light-theme);
 
@@ -22,5 +30,11 @@ $light-theme: mat.define-light-theme((color: (primary: mat.define-palette(mat.$i
   @include mat.all-component-colors($dark-theme);
 }
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+html,
+body {
+  height: 100%;
+}
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}

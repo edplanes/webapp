@@ -6,32 +6,30 @@ import { Config } from './config.model';
 
 interface ConfigState {
   isLoaded: boolean;
-  data: Config | null
+  data: Config | null;
 }
 
 const initialState: ConfigState = {
   isLoaded: false,
-  data: null
-}
+  data: null,
+};
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ConfigService {
+  private readonly state = new BehaviorSubject<ConfigState>(initialState);
 
-  private readonly state = new BehaviorSubject<ConfigState>(initialState)
+  public readonly state$ = this.state.asObservable();
 
-  public readonly state$ = this.state.asObservable()
-
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   public load(): Observable<Config> {
     const jsonFile = `assets/config/config.${environment.name}.json`;
     return this.http.get<Config>(jsonFile).pipe(
-      tap(config => {
-        this.state.next({ isLoaded: true, data: config })
-      })
-    )
+      tap((config) => {
+        this.state.next({ isLoaded: true, data: config });
+      }),
+    );
   }
-
 }
