@@ -4,7 +4,7 @@ import { environment } from '../../../environments/environment';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { Config } from './config.model';
 
-interface ConfigState {
+export interface ConfigState {
   isLoaded: boolean;
   data: Config | null;
 }

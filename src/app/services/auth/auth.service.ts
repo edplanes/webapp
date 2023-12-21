@@ -34,9 +34,12 @@ export class AuthService {
     return this.authSub.asObservable();
   }
 
-  constructor(private http: HttpClient) {
-    inject(ConfigService)
-      .state$.pipe(
+  constructor(
+    private http: HttpClient,
+    configService: ConfigService
+  ) {
+    configService.state$
+      .pipe(
         first(config => config.isLoaded),
         map(({ data }) => data)
       )
