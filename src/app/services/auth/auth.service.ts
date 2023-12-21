@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable, OnDestroy, inject } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { BehaviorSubject, Observable, first, map } from 'rxjs';
 import { IAuthInfo } from '../../models/auth.model';
 import { ConfigService } from '../config/config.service';
@@ -25,7 +25,7 @@ export const authGuard: CanActivateFn = (
 @Injectable({
   providedIn: 'root',
 })
-export class AuthService implements OnDestroy {
+export class AuthService {
   protected apiServer = '';
   private authSub: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(
     false
@@ -43,10 +43,6 @@ export class AuthService implements OnDestroy {
       .subscribe(config => (this.apiServer = config?.apiServer || ''));
   }
 
-  ngOnDestroy(): void {
-    throw new Error('Method not implemented.');
-  }
-
   login(username: string, password: string) {
     return this.http
       .post(`${this.apiServer}/auth`, null, {
@@ -61,6 +57,8 @@ export class AuthService implements OnDestroy {
         })
       );
   }
+
+  register() {}
 
   logout() {
     localStorage.removeItem('id_token');
