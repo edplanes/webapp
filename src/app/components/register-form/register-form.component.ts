@@ -12,9 +12,14 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { Router } from '@angular/router';
-import { Airport, AirportService } from '../../services/airport.service';
+import {
+  Airport,
+  AirportService,
+} from '../../services/airports/airport.service';
 import { Observable, of, startWith } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
+import { CustomValidators } from '../../customValidators';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-register-form',
@@ -28,6 +33,7 @@ import { AsyncPipe } from '@angular/common';
     FlexLayoutModule,
     MatAutocompleteModule,
     AsyncPipe,
+    MatIconModule,
   ],
   templateUrl: './register-form.component.html',
   styleUrl: './register-form.component.scss',
@@ -35,16 +41,23 @@ import { AsyncPipe } from '@angular/common';
 export class RegisterFormComponent implements OnInit {
   form: FormGroup;
   filteredAirports: Observable<Airport[]> = new Observable();
+  hidePassword = true;
 
   constructor(
     private fb: FormBuilder,
     private airportsService: AirportService,
     private router: Router
   ) {
-    this.form = this.fb.group({
-      username: ['', Validators.required],
-      homeAirport: ['', Validators.required],
-    });
+    this.form = this.fb.group(
+      {
+        username: ['', Validators.required],
+        homeAirport: ['', Validators.required],
+        email: ['', [Validators.required, Validators.email]],
+        password: ['', [Validators.required, Validators.minLength(8)]],
+        confirmPassword: [''],
+      },
+      { validators: CustomValidators.passwordMatch() }
+    );
   }
   ngOnInit(): void {
     this.form.controls['homeAirport'].valueChanges
@@ -56,7 +69,9 @@ export class RegisterFormComponent implements OnInit {
       );
   }
 
-  onSubmit() { }
+  onSubmit() {
+    console.log(this.form.value, this.form.get('confirmPassword')?.errors);
+  }
 
   displayAirport(airport: Airport): string {
     return (airport && `${airport.icao} - ${airport.name}`) || '';

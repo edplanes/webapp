@@ -5,6 +5,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { Subscription, map, timer } from 'rxjs';
 
@@ -19,6 +20,7 @@ import { Subscription, map, timer } from 'rxjs';
     FlexLayoutModule,
     MatSlideToggleModule,
     ReactiveFormsModule,
+    RouterModule,
   ],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss',

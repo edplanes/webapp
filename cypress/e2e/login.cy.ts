@@ -29,6 +29,7 @@ describe('Login Page', () => {
   });
 
   it('verifies the login flow', () => {
+    cy.clock(new Date('2023-12-20T01:04:33.907518411Z'));
     cy.intercept(
       '/api/auth',
       {

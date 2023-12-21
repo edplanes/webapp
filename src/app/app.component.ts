@@ -22,7 +22,7 @@ export class AppComponent implements OnInit {
       .subscribe(
         event =>
           (this.isHeadless = !!(<NavigationEnd>event).url.match(
-            /(login|register)$/
+            /(login|register)(?:\?returnUrl=.*)?$/
           ))
       );
   }

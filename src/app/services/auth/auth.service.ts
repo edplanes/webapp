@@ -3,6 +3,24 @@ import { Injectable, OnDestroy, inject } from '@angular/core';
 import { BehaviorSubject, Observable, first, map } from 'rxjs';
 import { IAuthInfo } from '../../models/auth.model';
 import { ConfigService } from '../config/config.service';
+import {
+  ActivatedRouteSnapshot,
+  CanActivateFn,
+  Router,
+  RouterStateSnapshot,
+} from '@angular/router';
+
+export const authGuard: CanActivateFn = (
+  route: ActivatedRouteSnapshot,
+  state: RouterStateSnapshot
+) => {
+  if (inject(AuthService).isLoggedIn()) return true;
+
+  inject(Router).navigate(['/login'], {
+    queryParams: { returnUrl: state.url },
+  });
+  return false;
+};
 
 @Injectable({
   providedIn: 'root',

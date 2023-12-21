@@ -7,7 +7,7 @@
       <mat-form-field>
         <mat-label>Username</mat-label>
         <input type="text" matInput formControlName="username" />
-        @if (form.getError('required', 'username')) {
+        @if (form.get('username')?.hasError('required')) {
           <mat-error>Username is required</mat-error>
         }
       </mat-form-field>
@@ -27,7 +27,68 @@
             }}</mat-option>
           }
         </mat-autocomplete>
+        @if (form.get('homeAirport')?.hasError('required')) {
+          <mat-error>Home Airport is required</mat-error>
+        }
       </mat-form-field>
+      <mat-form-field>
+        <mat-label>Email</mat-label>
+        <input
+          type="text"
+          matInput
+          formControlName="email"
+          placeholder="Ex. pat@localhost.com" />
+        @if (form.get('email')?.hasError('required')) {
+          <mat-error>Email is required</mat-error>
+        }
+        @if (form.get('email')?.hasError('email')) {
+          <mat-error>Email is invalid</mat-error>
+        }
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Enter your password</mat-label>
+        <input
+          [type]="hidePassword ? 'password' : 'text'"
+          matInput
+          formControlName="password" />
+        @if (form.hasError('required', 'password')) {
+          <mat-error>Password is required</mat-error>
+        }
+        @if (form.hasError('minlength', 'password')) {
+          <mat-error>Password have to be at least 8 characters long</mat-error>
+        }
+        <button
+          mat-icon-button
+          matSuffix
+          (click)="hidePassword = !hidePassword"
+          [attr.aria-label]="'Hide password'"
+          [attr.aria-pressed]="hidePassword">
+          <mat-icon>{{
+            hidePassword ? 'visibility_off' : 'visibility'
+          }}</mat-icon>
+        </button>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Repeat your password</mat-label>
+        <input
+          matInput
+          [type]="hidePassword ? 'password' : 'text'"
+          formControlName="confirmPassword" />
+        @if (form.hasError('nopasswordmatch', 'confirmPassword')) {
+          <mat-error>Passwords doesn't match</mat-error>
+        }
+        <button
+          mat-icon-button
+          matSuffix
+          (click)="hidePassword = !hidePassword"
+          [attr.aria-label]="'Hide password'"
+          [attr.aria-pressed]="hidePassword">
+          <mat-icon>{{
+            hidePassword ? 'visibility_off' : 'visibility'
+          }}</mat-icon>
+        </button>
+      </mat-form-field>
+
       <mat-card-actions fxLayout fxLayoutAlign="end center">
         <button type="submit" mat-raised-button color="primary">
           Register

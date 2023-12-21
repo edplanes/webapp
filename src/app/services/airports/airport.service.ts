@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { first, map, of } from 'rxjs';
-import { ConfigService } from './config/config.service';
+import { ConfigService } from '../config/config.service';
 import { HttpClient } from '@angular/common/http';
 
 export interface AirportLocation {

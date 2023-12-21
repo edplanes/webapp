@@ -6,7 +6,7 @@ import { AirportService } from './airport.service';
 describe('Service: Airport', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [AirportService]
+      providers: [AirportService],
     });
   });
 

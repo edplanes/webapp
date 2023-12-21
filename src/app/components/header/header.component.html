@@ -1,8 +1,8 @@
 <mat-toolbar color="primary">
   <mat-toolbar-row>
-    <a mat-button class="companyName" routerLink="/">
+    <button mat-button class="companyName" [routerLink]="'/'">
       <span>EdPlanes</span>
-    </a>
+    </button>
     <span class="spacer"></span>
     <div fxHide.lt-sm="true">
       <mat-icon>access_time</mat-icon>&nbsp;{{

@@ -12,5 +12,9 @@ describe('Register page', () => {
     cy.visit('/register');
     cy.get('input[formControlName="homeAirport"]').type('ep');
     cy.contains('EPAR').click();
+    cy.get('input[formControlName="homeAirport"]').should(
+      'have.value',
+      'EPAR - Arłamów Airport'
+    );
   });
 });
