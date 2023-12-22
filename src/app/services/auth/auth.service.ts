@@ -9,6 +9,7 @@ import {
   Router,
   RouterStateSnapshot,
 } from '@angular/router';
+import { LogService } from '../log/log.service';
 
 export const authGuard: CanActivateFn = (
   route: ActivatedRouteSnapshot,
@@ -36,6 +37,7 @@ export class AuthService {
 
   constructor(
     private http: HttpClient,
+    private logger: LogService,
     configService: ConfigService
   ) {
     configService.state$
@@ -56,6 +58,9 @@ export class AuthService {
       .pipe(
         first(res => {
           this.setSession(res);
+          this.logger.debug(
+            `User ${res.payload.email} authenticated, setting session...`
+          );
           return true;
         })
       );

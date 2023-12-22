@@ -1,3 +1,12 @@
 {
-  "apiServer": "http://localhost:8080/api"
+  "apiServer": "http://localhost:8080/api",
+  "logger": {
+    "level": 1,
+    "publishers": [
+      {
+        "name": "console",
+        "isActive": true
+      }
+    ]
+  }
 }

@@ -3,11 +3,13 @@ import { CommonModule } from '@angular/common';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { HeaderComponent } from './components/header/header.component';
 import { filter } from 'rxjs';
+import { LogService } from './services/log/log.service';
 
 @Component({
   selector: 'app-root',
   standalone: true,
   imports: [CommonModule, RouterOutlet, HeaderComponent],
+  providers: [LogService],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
 })

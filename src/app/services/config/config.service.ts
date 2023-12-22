@@ -2,9 +2,20 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { LogLevel } from '../log/log.service';
+
+export interface LogPublisherConfig {
+  name: string;
+  location: string;
+  isActive: boolean;
+}
 
 export interface Config {
   apiServer: string;
+  logger: {
+    level: LogLevel;
+    publishers: LogPublisherConfig[];
+  };
 }
 
 export interface ConfigState {
