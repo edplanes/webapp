@@ -7,7 +7,8 @@ import {
 } from '@angular/common/http/testing';
 import { HttpErrorResponse } from '@angular/common/http';
 import { IAuthInfo } from '../../models/auth.model';
-import { catchError, throwError } from 'rxjs';
+import { LogService } from '../log/log.service';
+import { UserNotFound } from '../../shared/errors/UserNotFound';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -16,6 +17,7 @@ describe('AuthService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
+      providers: [LogService],
     });
     service = TestBed.inject(AuthService);
     httpController = TestBed.inject(HttpTestingController);
@@ -56,32 +58,18 @@ describe('AuthService', () => {
       .flush(expectedAuthInfo);
   });
 
-  it('should pass error response', (done: DoneFn) => {
+  it('should provide domain error instead of http error', (done: DoneFn) => {
     const errorResponse: HttpErrorResponse = new HttpErrorResponse({
       error: 'Not found',
       status: 404,
     });
 
-    service
-      .login('test@email.local', 'some-pass')
-      .pipe(
-        catchError((error: HttpErrorResponse) => {
-          expect(error.error)
-            .withContext('expected error')
-            .toBe(errorResponse.error);
-          expect(error.status)
-            .withContext('expected status')
-            .toBe(errorResponse.status);
-
-          return throwError(() => new Error('Not found'));
-        })
-      )
-      .subscribe({
-        error: (error: Error) => {
-          expect(error.message).toBe('Not found');
-          done();
-        },
-      });
+    service.login('test@email.local', 'some-pass').subscribe({
+      error: (error: Error) => {
+        expect(error).toBeInstanceOf(UserNotFound);
+        done();
+      },
+    });
 
     httpController
       .expectOne({

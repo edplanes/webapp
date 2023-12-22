@@ -1,6 +1,14 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { BehaviorSubject, Observable, first, map } from 'rxjs';
+import {
+  BehaviorSubject,
+  Observable,
+  ObservableInput,
+  catchError,
+  first,
+  map,
+  throwError,
+} from 'rxjs';
 import { IAuthInfo } from '../../models/auth.model';
 import { ConfigService } from '../config/config.service';
 import {
@@ -10,6 +18,8 @@ import {
   RouterStateSnapshot,
 } from '@angular/router';
 import { LogService } from '../log/log.service';
+import { UserAlreadyExists } from '../../shared/errors/UserAlreadyExists';
+import { UserNotFound } from '../../shared/errors/UserNotFound';
 
 export const authGuard: CanActivateFn = (
   route: ActivatedRouteSnapshot,
@@ -56,6 +66,7 @@ export class AuthService {
         },
       })
       .pipe(
+        catchError(this.handleError.bind(this)),
         first(res => {
           this.setSession(res);
           this.logger.debug(
@@ -74,7 +85,7 @@ export class AuthService {
     localStorage.removeItem('user');
   }
 
-  public isLoggedIn() {
+  isLoggedIn() {
     return Date.now() < this.getExpiration();
   }
 
@@ -95,5 +106,25 @@ export class AuthService {
     const expiry = localStorage.getItem('expires_at')!;
     const expiresAt: number = JSON.parse(expiry);
     return expiresAt;
+  }
+
+  private handleError(
+    errorResponse: HttpErrorResponse
+  ): ObservableInput<IAuthInfo> {
+    this.logger.warn(
+      `received ${errorResponse.status} status code, let's try handle it..`
+    );
+
+    switch (errorResponse.status) {
+      case 409:
+        this.logger.info(`user already exists: ${errorResponse.error}`);
+        return throwError(() => new UserAlreadyExists());
+      case 404:
+        this.logger.info(`user not found: ${errorResponse.error}`);
+        return throwError(() => new UserNotFound());
+      default:
+        this.logger.fatal(`unknown error code received!`, errorResponse);
+        return throwError(() => new Error('unknown error received'));
+    }
   }
 }

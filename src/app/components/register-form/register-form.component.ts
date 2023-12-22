@@ -20,6 +20,7 @@ import { Observable, of, startWith } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
 import { CustomValidators } from '../../customValidators';
 import { MatIconModule } from '@angular/material/icon';
+import { AuthService } from '../../services/auth/auth.service';
 
 @Component({
   selector: 'app-register-form',
@@ -46,6 +47,7 @@ export class RegisterFormComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private airportsService: AirportService,
+    private authService: AuthService,
     private router: Router
   ) {
     this.form = this.fb.group(
@@ -70,7 +72,7 @@ export class RegisterFormComponent implements OnInit {
   }
 
   onSubmit() {
-    console.log(this.form.value, this.form.get('confirmPassword')?.errors);
+    this.authService.register();
   }
 
   displayAirport(airport: Airport): string {
