@@ -3,32 +3,14 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 
 import { LoginFormComponent } from './login-form.component';
-import { AuthService } from '../../services/auth/auth.service';
-import { Observable, of } from 'rxjs';
-import { IAuthInfo } from '../../models/auth.model';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { Injectable } from '@angular/core';
-
-@Injectable()
-class MockAuthService extends AuthService {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  override login(username: string, password: string): Observable<IAuthInfo> {
-    const authInfo: IAuthInfo = {
-      token: 'some-token',
-      payload: {
-        email: 'some@email.com',
-        id: 'some-id',
-      },
-      expiresAt: Date.now(),
-    };
-
-    return of(authInfo);
-  }
-}
+import { AuthService } from '../../services/auth/auth.service';
+import { of } from 'rxjs';
 
 describe('LoginFormComponent', () => {
   let component: LoginFormComponent;
   let fixture: ComponentFixture<LoginFormComponent>;
+  let authService: AuthService;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -38,14 +20,9 @@ describe('LoginFormComponent', () => {
         RouterTestingModule,
         BrowserAnimationsModule,
       ],
-      providers: [
-        {
-          provide: AuthService,
-          useClass: MockAuthService,
-        },
-      ],
     }).compileComponents();
 
+    authService = TestBed.inject(AuthService);
     fixture = TestBed.createComponent(LoginFormComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
@@ -53,5 +30,28 @@ describe('LoginFormComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('should emit output on successful login', () => {
+    const authSpy = spyOn(authService, 'login');
+    authSpy.and.returnValue(
+      of({
+        token: 'some-token',
+        payload: {
+          email: 'test@local.host',
+          id: 'some-id',
+        },
+        expiresAt: Date.now(),
+      })
+    );
+    spyOnProperty(component.form, 'valid').and.returnValue(true);
+
+    component.onSubmit();
+
+    component.loginSuccess.subscribe({
+      next: (val: boolean) => {
+        expect(val).toBeTruthy();
+      },
+    });
   });
 });

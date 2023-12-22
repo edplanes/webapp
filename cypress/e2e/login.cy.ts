@@ -57,6 +57,6 @@ describe('Login Page', () => {
     cy.get('input[type="password"]').type('admin');
     cy.get('button[type="submit"]').click();
     cy.wait('@login');
-    cy.url().should('match', /(http:\/\/|https:\/\/)?[^/?]+\/$/);
+    cy.url().should('match', /(http:\/\/|https:\/\/)?[^/?]+\/user$/);
   });
 });

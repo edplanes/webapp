@@ -1,5 +1,5 @@
 {
-  "include": ["./**/*cy.ts", "../cypress.config.ts"],
+  "include": ["./**/*cy.ts", "../cypress.config.ts", "support"],
   "compilerOptions": {
     "sourceMap": false,
     "strict": true,

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { AuthService } from '../../services/auth/auth.service';
 import {
   FormBuilder,
@@ -6,7 +6,6 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -29,21 +28,16 @@ import { FlexLayoutModule } from '@angular/flex-layout';
 })
 export class LoginFormComponent {
   form: FormGroup;
-  returnUrl: string = '/';
+  loginError: Error | null = null;
+  @Output() public loginSuccess = new EventEmitter<boolean>();
 
   constructor(
-    private fb: FormBuilder,
     private authService: AuthService,
-    private router: Router,
-    route: ActivatedRoute
+    fb: FormBuilder
   ) {
-    this.form = this.fb.group({
+    this.form = fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.min(6)]],
-    });
-
-    route.queryParams.subscribe(params => {
-      this.returnUrl = params['returnUrl'] || '';
     });
   }
 
@@ -53,8 +47,14 @@ export class LoginFormComponent {
     }
 
     const val = this.form.value;
-    this.authService
-      .login(val.email, val.password)
-      .subscribe(() => this.router.navigateByUrl(this.returnUrl));
+    this.authService.login(val.email, val.password).subscribe({
+      next: () => {
+        console.log('authenticated');
+        this.loginSuccess.emit(true);
+      },
+      error: (err: Error) => {
+        this.loginError = err;
+      },
+    });
   }
 }
