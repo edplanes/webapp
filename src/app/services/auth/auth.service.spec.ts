@@ -7,19 +7,7 @@ import {
 } from '@angular/common/http/testing';
 import { HttpErrorResponse } from '@angular/common/http';
 import { IAuthInfo } from '../../models/auth.model';
-import { Observable, catchError, of, throwError } from 'rxjs';
-import { ConfigService, ConfigState } from '../config/config.service';
-import { Injectable } from '@angular/core';
-
-@Injectable()
-class MockedConfigService extends ConfigService {
-  public override state$: Observable<ConfigState> = of({
-    isLoaded: true,
-    data: {
-      apiServer: 'http://test/api',
-    },
-  });
-}
+import { catchError, throwError } from 'rxjs';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -28,12 +16,6 @@ describe('AuthService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [
-        {
-          provide: ConfigService,
-          useClass: MockedConfigService,
-        },
-      ],
     });
     service = TestBed.inject(AuthService);
     httpController = TestBed.inject(HttpTestingController);
@@ -69,7 +51,7 @@ describe('AuthService', () => {
     httpController
       .expectOne({
         method: 'GET',
-        url: 'http://test/api/auth',
+        url: '/auth',
       })
       .flush(expectedAuthInfo);
   });
@@ -104,7 +86,7 @@ describe('AuthService', () => {
     httpController
       .expectOne({
         method: 'GET',
-        url: 'http://test/api/auth',
+        url: '/auth',
       })
       .flush(errorResponse.error, {
         status: errorResponse.status,
@@ -127,7 +109,7 @@ describe('AuthService', () => {
     httpController
       .expectOne({
         method: 'GET',
-        url: 'http://test/api/auth',
+        url: '/auth',
       })
       .flush(expectedAuthInfo);
 
