@@ -43,7 +43,6 @@ export class LoginFormComponent {
     });
 
     route.queryParams.subscribe(params => {
-      console.log(params);
       this.returnUrl = params['returnUrl'] || '';
     });
   }
