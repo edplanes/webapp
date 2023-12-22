@@ -2,7 +2,10 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
-import { Config } from './config.model';
+
+export interface Config {
+  apiServer: string;
+}
 
 export interface ConfigState {
   isLoaded: boolean;
@@ -27,8 +30,10 @@ export class ConfigService {
   public load(): Observable<Config> {
     const jsonFile = `assets/config/config.${environment.name}.json`;
     return this.http.get<Config>(jsonFile).pipe(
-      tap(config => {
-        this.state.next({ isLoaded: true, data: config });
+      tap({
+        next: config => {
+          this.state.next({ isLoaded: true, data: config });
+        },
       })
     );
   }
