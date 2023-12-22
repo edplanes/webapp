@@ -9,7 +9,9 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { IAuthInfo } from '../../models/auth.model';
 import { Observable, catchError, of, throwError } from 'rxjs';
 import { ConfigService, ConfigState } from '../config/config.service';
+import { Injectable } from '@angular/core';
 
+@Injectable()
 class MockedConfigService extends ConfigService {
   public override state$: Observable<ConfigState> = of({
     isLoaded: true,
