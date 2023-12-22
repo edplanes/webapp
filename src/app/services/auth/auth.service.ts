@@ -48,14 +48,14 @@ export class AuthService {
 
   login(username: string, password: string) {
     return this.http
-      .post(`${this.apiServer}/auth`, null, {
+      .get<IAuthInfo>(`${this.apiServer}/auth`, {
         headers: {
           Authorization: `Basic ${window.btoa(`${username}:${password}`)}`,
         },
       })
       .pipe(
         first(res => {
-          this.setSession(<IAuthInfo>res);
+          this.setSession(res);
           return true;
         })
       );

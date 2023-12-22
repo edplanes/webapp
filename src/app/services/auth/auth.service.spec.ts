@@ -1,10 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
 import { AuthService } from './auth.service';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { HttpClient } from '@angular/common/http';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
+import { HttpErrorResponse } from '@angular/common/http';
 import { IAuthInfo } from '../../models/auth.model';
-import { Observable, of } from 'rxjs';
+import { Observable, catchError, of, throwError } from 'rxjs';
 import { ConfigService, ConfigState } from '../config/config.service';
 
 class MockedConfigService extends ConfigService {
@@ -18,21 +21,24 @@ class MockedConfigService extends ConfigService {
 
 describe('AuthService', () => {
   let service: AuthService;
-  let httpClientSpy: jasmine.SpyObj<HttpClient>;
+  let httpController: HttpTestingController;
 
   beforeEach(() => {
-    httpClientSpy = jasmine.createSpyObj('HttpClient', ['post']);
-    const configService = new MockedConfigService(httpClientSpy);
-    service = new AuthService(httpClientSpy, configService);
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       providers: [
         {
           provide: ConfigService,
-          useValue: configService,
+          useClass: MockedConfigService,
         },
       ],
     });
+    service = TestBed.inject(AuthService);
+    httpController = TestBed.inject(HttpTestingController);
+  });
+
+  afterEach(() => {
+    httpController.verify();
   });
 
   it('should be created', () => {
@@ -48,7 +54,6 @@ describe('AuthService', () => {
       },
       expiresAt: 1703197072786,
     };
-    httpClientSpy.post.and.returnValue(of(expectedAuthInfo));
 
     service.login('test@email.local', 'some-pass').subscribe({
       next: authInfo => {
@@ -59,13 +64,49 @@ describe('AuthService', () => {
       },
       error: done.fail,
     });
-    expect(httpClientSpy.post.calls.count())
-      .withContext('single call expected')
-      .toBe(1);
-    expect(httpClientSpy.post.calls.first().args[2]?.headers)
-      .withContext('contains authorization header')
-      .toEqual({
-        Authorization: 'Basic dGVzdEBlbWFpbC5sb2NhbDpzb21lLXBhc3M=',
+    httpController
+      .expectOne({
+        method: 'GET',
+        url: 'http://test/api/auth',
+      })
+      .flush(expectedAuthInfo);
+  });
+
+  it('should pass error response', (done: DoneFn) => {
+    const errorResponse: HttpErrorResponse = new HttpErrorResponse({
+      error: 'Not found',
+      status: 404,
+    });
+
+    service
+      .login('test@email.local', 'some-pass')
+      .pipe(
+        catchError((error: HttpErrorResponse) => {
+          expect(error.error)
+            .withContext('expected error')
+            .toBe(errorResponse.error);
+          expect(error.status)
+            .withContext('expected status')
+            .toBe(errorResponse.status);
+
+          return throwError(() => new Error('Not found'));
+        })
+      )
+      .subscribe({
+        error: (error: Error) => {
+          expect(error.message).toBe('Not found');
+          done();
+        },
+      });
+
+    httpController
+      .expectOne({
+        method: 'GET',
+        url: 'http://test/api/auth',
+      })
+      .flush(errorResponse.error, {
+        status: errorResponse.status,
+        statusText: errorResponse.error,
       });
   });
 
@@ -78,9 +119,15 @@ describe('AuthService', () => {
       },
       expiresAt: 1703197072786,
     };
-    httpClientSpy.post.and.returnValue(of(expectedAuthInfo));
 
     service.login('test@email.local', 'some-pass').subscribe();
+
+    httpController
+      .expectOne({
+        method: 'GET',
+        url: 'http://test/api/auth',
+      })
+      .flush(expectedAuthInfo);
 
     expect(localStorage.getItem('id_token')).toBe(expectedAuthInfo.token);
     expect(Number(localStorage.getItem('expires_at'))).toBe(
