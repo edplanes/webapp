@@ -1,3 +1,5 @@
+import { setLocalStorageUser } from '../support/e2e';
+
 describe('Login Page', () => {
   before(() => {
     cy.intercept('/assets/config/config.dev.json', {
@@ -5,6 +7,10 @@ describe('Login Page', () => {
         apiServer: 'http://localhost:8080/api',
       },
     });
+  });
+
+  afterEach(() => {
+    cy.clearAllLocalStorage();
   });
 
   it('invalid form not cause request', () => {
@@ -76,6 +82,13 @@ describe('Login Page', () => {
     cy.get('input[type="password"]').type('admin');
     cy.get('button[type="submit"]').click();
     cy.wait('@login');
+    cy.url().should('match', /(http:\/\/|https:\/\/)?[^/?]+\/user$/);
+  });
+
+  it('redirect user when authenticated', () => {
+    cy.clock(new Date('2023-12-20T01:04:33.907518411Z'));
+    cy.visit('/login');
+    setLocalStorageUser();
     cy.url().should('match', /(http:\/\/|https:\/\/)?[^/?]+\/user$/);
   });
 });

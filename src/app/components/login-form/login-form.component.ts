@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { AuthService } from '../../services/auth/auth.service';
 import {
   FormBuilder,
@@ -29,7 +29,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
   templateUrl: './login-form.component.html',
   styleUrl: './login-form.component.scss',
 })
-export class LoginFormComponent {
+export class LoginFormComponent implements OnInit {
   form: FormGroup;
   @Output() public loginSuccess = new EventEmitter<boolean>();
 
@@ -42,6 +42,12 @@ export class LoginFormComponent {
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.min(6)]],
     });
+  }
+
+  ngOnInit(): void {
+    if (this.authService.isAuthenticated) {
+      this.loginSuccess.next(true);
+    }
   }
 
   onSubmit() {
