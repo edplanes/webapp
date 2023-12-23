@@ -1,4 +1,4 @@
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import {
   BehaviorSubject,
@@ -6,11 +6,9 @@ import {
   ObservableInput,
   catchError,
   first,
-  map,
   throwError,
 } from 'rxjs';
 import { IAuthInfo } from '../../models/auth.model';
-import { ConfigService } from '../config/config.service';
 import {
   ActivatedRouteSnapshot,
   CanActivateFn,
@@ -20,6 +18,7 @@ import {
 import { LogService } from '../log/log.service';
 import { UserAlreadyExists } from '../../shared/errors/UserAlreadyExists';
 import { UserNotFound } from '../../shared/errors/UserNotFound';
+import { AuthClient } from '../../clients/auth.client';
 
 export const authGuard: CanActivateFn = (
   route: ActivatedRouteSnapshot,
@@ -37,7 +36,6 @@ export const authGuard: CanActivateFn = (
   providedIn: 'root',
 })
 export class AuthService {
-  protected apiServer = '';
   private authSub: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(
     false
   );
@@ -46,35 +44,21 @@ export class AuthService {
   }
 
   constructor(
-    private http: HttpClient,
     private logger: LogService,
-    configService: ConfigService
-  ) {
-    configService.state$
-      .pipe(
-        first(config => config.isLoaded),
-        map(({ data }) => data)
-      )
-      .subscribe(config => (this.apiServer = config?.apiServer || ''));
-  }
+    private authClient: AuthClient
+  ) {}
 
   login(username: string, password: string) {
-    return this.http
-      .get<IAuthInfo>(`${this.apiServer}/auth`, {
-        headers: {
-          Authorization: `Basic ${window.btoa(`${username}:${password}`)}`,
-        },
+    return this.authClient.login(username, password).pipe(
+      catchError(this.handleError.bind(this)),
+      first(res => {
+        this.setSession(res);
+        this.logger.debug(
+          `User ${res.payload.email} authenticated, setting session...`
+        );
+        return true;
       })
-      .pipe(
-        catchError(this.handleError.bind(this)),
-        first(res => {
-          this.setSession(res);
-          this.logger.debug(
-            `User ${res.payload.email} authenticated, setting session...`
-          );
-          return true;
-        })
-      );
+    );
   }
 
   register() {}

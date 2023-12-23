@@ -9,16 +9,20 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { IAuthInfo } from '../../models/auth.model';
 import { LogService } from '../log/log.service';
 import { UserNotFound } from '../../shared/errors/UserNotFound';
+import { AuthClient } from '../../clients/auth.client';
+import { of, throwError } from 'rxjs';
 
 describe('AuthService', () => {
   let service: AuthService;
+  let client: AuthClient;
   let httpController: HttpTestingController;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [LogService],
+      providers: [LogService, AuthClient],
     });
+    client = TestBed.inject(AuthClient);
     service = TestBed.inject(AuthService);
     httpController = TestBed.inject(HttpTestingController);
   });
@@ -40,6 +44,8 @@ describe('AuthService', () => {
       },
       expiresAt: 1703197072786,
     };
+    const authClientSpy = spyOn(client, 'login');
+    authClientSpy.and.returnValue(of(expectedAuthInfo));
 
     service.login('test@email.local', 'some-pass').subscribe({
       next: authInfo => {
@@ -50,12 +56,6 @@ describe('AuthService', () => {
       },
       error: done.fail,
     });
-    httpController
-      .expectOne({
-        method: 'GET',
-        url: '/auth',
-      })
-      .flush(expectedAuthInfo);
   });
 
   it('should provide domain error instead of http error', (done: DoneFn) => {
@@ -63,6 +63,8 @@ describe('AuthService', () => {
       error: 'Not found',
       status: 404,
     });
+    const authClientSpy = spyOn(client, 'login');
+    authClientSpy.and.returnValue(throwError(() => errorResponse));
 
     service.login('test@email.local', 'some-pass').subscribe({
       error: (error: Error) => {
@@ -70,16 +72,6 @@ describe('AuthService', () => {
         done();
       },
     });
-
-    httpController
-      .expectOne({
-        method: 'GET',
-        url: '/auth',
-      })
-      .flush(errorResponse.error, {
-        status: errorResponse.status,
-        statusText: errorResponse.error,
-      });
   });
 
   it('should update localstorage', () => {
@@ -91,15 +83,10 @@ describe('AuthService', () => {
       },
       expiresAt: 1703197072786,
     };
+    const authClientSpy = spyOn(client, 'login');
+    authClientSpy.and.returnValue(of(expectedAuthInfo));
 
     service.login('test@email.local', 'some-pass').subscribe();
-
-    httpController
-      .expectOne({
-        method: 'GET',
-        url: '/auth',
-      })
-      .flush(expectedAuthInfo);
 
     expect(localStorage.getItem('id_token')).toBe(expectedAuthInfo.token);
     expect(Number(localStorage.getItem('expires_at'))).toBe(
