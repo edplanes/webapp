@@ -20,4 +20,28 @@ describe('HeaderComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('should select light mode when dark is not preferable', () => {
+    const matchMediaSpy = spyOn(window, 'matchMedia');
+    matchMediaSpy.and.returnValue({
+      ...window.matchMedia('(prefers-color-scheme: dark)'),
+      matches: false,
+    });
+
+    expect(component.toogleControl.value).toBeFalsy();
+  });
+
+  it('should select dark mode if preferable', () => {
+    const matchMediaSpy = spyOn(window, 'matchMedia');
+    matchMediaSpy.and.returnValue({
+      ...window.matchMedia('(prefers-color-scheme: dark)'),
+      matches: true,
+    });
+
+    fixture = TestBed.createComponent(HeaderComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+
+    expect(component.toogleControl.value).toBeTruthy();
+  });
 });

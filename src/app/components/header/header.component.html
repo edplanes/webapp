@@ -1,24 +1,19 @@
 <mat-toolbar color="primary">
-  <mat-toolbar-row>
-    <button mat-button class="companyName" [routerLink]="'/'">
+  <mat-toolbar-row fxLayout fxLayoutAlign="space-between center">
+    <button mat-button class="brand" [routerLink]="'/'">
       <span>EdPlanes</span>
     </button>
-    <span class="spacer"></span>
     <div fxHide.lt-sm="true">
       <mat-icon>access_time</mat-icon>&nbsp;{{
         currentUTCTime | date: 'HH:mm'
       }}&nbsp;zulu
     </div>
-    <span class="spacer"></span>
     <div fxHide.lt-sm="true">
       <mat-icon>access_time</mat-icon>&nbsp;
       {{ currentTime | date: 'HH:mm' }}&nbsp; local
     </div>
-    <span class="spacer"></span>
-    <mat-icon class="mr-8">brightness_5</mat-icon>
-    <mat-slide-toggle [formControl]="toogleControl" class="mr-8">
+    <mat-slide-toggle [formControl]="toogleControl" class="mr-8 theme-switch">
     </mat-slide-toggle>
-    <mat-icon>bedtime</mat-icon>
   </mat-toolbar-row>
-  <mat-toolbar-row *ngIf="!isHeadless"> </mat-toolbar-row>
+  <mat-toolbar-row *ngIf="!isHeadless"></mat-toolbar-row>
 </mat-toolbar>

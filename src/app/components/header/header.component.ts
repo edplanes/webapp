@@ -27,7 +27,7 @@ import { Subscription, map, timer } from 'rxjs';
 })
 export class HeaderComponent implements OnInit {
   @Input() isHeadless: boolean = false;
-  toogleControl = new FormControl(true);
+  toogleControl = new FormControl(this.prefersDarkMode());
   currentTime = new Date();
   currentUTCTime = new Date(
     this.currentTime.getTime() + this.currentTime.getTimezoneOffset() * 60000
@@ -49,5 +49,9 @@ export class HeaderComponent implements OnInit {
           time.getTime() + time.getTimezoneOffset() * 60000
         );
       });
+  }
+
+  private prefersDarkMode() {
+    return window.matchMedia('(prefers-color-scheme: dark)').matches;
   }
 }
