@@ -83,9 +83,7 @@ export class LogService {
     entry.extraInfo = params;
     entry.logWithDate = this.logDate;
 
-    console.log(this.shouldLog(level), entry, this.publishers);
-
-    this.publishers.forEach(logger => logger.log(entry).subscribe(console.log));
+    this.publishers.forEach(logger => logger.log(entry).subscribe(() => {}));
   }
 
   private shouldLog(level: LogLevel) {

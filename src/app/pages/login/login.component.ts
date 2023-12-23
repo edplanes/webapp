@@ -24,7 +24,6 @@ export class LoginComponent {
   }
 
   loginSuccessed() {
-    console.log(this.redirectUrl);
     this.router.navigateByUrl(this.redirectUrl);
   }
 }

@@ -31,7 +31,9 @@
         }
       </mat-form-field>
       <mat-card-actions fxLayout fxLayoutAlign="space-between center">
-        <button mat-stroked-button>Create New Account</button>
+        <button mat-stroked-button [routerLink]="'/register'">
+          Create New Account
+        </button>
         <button type="submit" mat-raised-button color="primary">Login</button>
       </mat-card-actions>
     </form>

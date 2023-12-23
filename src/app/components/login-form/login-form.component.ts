@@ -11,6 +11,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { FlexLayoutModule } from '@angular/flex-layout';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-login-form',
@@ -22,6 +23,7 @@ import { FlexLayoutModule } from '@angular/flex-layout';
     MatInputModule,
     MatButtonModule,
     FlexLayoutModule,
+    RouterModule,
   ],
   templateUrl: './login-form.component.html',
   styleUrl: './login-form.component.scss',
@@ -49,7 +51,6 @@ export class LoginFormComponent {
     const val = this.form.value;
     this.authService.login(val.email, val.password).subscribe({
       next: () => {
-        console.log('authenticated');
         this.loginSuccess.emit(true);
       },
       error: (err: Error) => {
