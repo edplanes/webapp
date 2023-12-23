@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ConfigService } from '../services/config/config.service';
-import { first, map } from 'rxjs';
-import { IAuthInfo } from '../models/auth.model';
+import { Observable, first, map } from 'rxjs';
+import { IAuthInfo, IUser } from '../models/auth.model';
 import { HttpClient } from '@angular/common/http';
 
 @Injectable({
@@ -22,11 +22,26 @@ export class AuthClient {
       .subscribe(config => (this.apiServerBaseUrl = config?.apiServer || ''));
   }
 
-  login(username: string, password: string) {
+  login(email: string, password: string) {
     return this.http.get<IAuthInfo>(`${this.apiServerBaseUrl}/auth`, {
       headers: {
-        Authorization: `Basic ${window.btoa(`${username}:${password}`)}`,
+        Authorization: `Basic ${window.btoa(`${email}:${password}`)}`,
       },
     });
+  }
+
+  register(
+    username: string,
+    homeAirportIcao: string,
+    email: string,
+    password: string
+  ): Observable<IUser> {
+    const body = {
+      username,
+      homeAirportIcao,
+      email,
+      password,
+    };
+    return this.http.post<IUser>(`${this.apiServerBaseUrl}/auth`, body);
   }
 }

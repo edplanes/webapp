@@ -48,8 +48,8 @@ export class AuthService {
     private authClient: AuthClient
   ) {}
 
-  login(username: string, password: string) {
-    return this.authClient.login(username, password).pipe(
+  login(email: string, password: string) {
+    return this.authClient.login(email, password).pipe(
       catchError(this.handleError.bind(this)),
       first(res => {
         this.setSession(res);
