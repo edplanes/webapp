@@ -3,9 +3,6 @@
     <mat-card-title>Login</mat-card-title>
   </mat-card-header>
   <mat-card-content>
-    @if (loginError) {
-      <mat-error class="loginError">{{ loginError.message }}</mat-error>
-    }
     <form [formGroup]="form" (ngSubmit)="onSubmit()">
       <mat-form-field>
         <input

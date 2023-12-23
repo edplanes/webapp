@@ -28,6 +28,25 @@ describe('Login Page', () => {
     cy.get('mat-toolbar > mat-toolbar-row').should('have.length', 1);
   });
 
+  it('display error alert when received from backend', () => {
+    cy.clock(new Date('2023-12-20T01:04:33.907518411Z'));
+    cy.intercept(
+      '/api/auth',
+      {
+        hostname: 'localhost',
+      },
+      req => {
+        req.reply(404, 'User not found');
+      }
+    ).as('login');
+    cy.visit('/login');
+    cy.get('input[type="email"]').type('admin@localhost.com');
+    cy.get('input[type="password"]').type('admin');
+    cy.get('button[type="submit"]').click();
+    cy.wait('@login');
+    cy.contains('User not found');
+  });
+
   it('verifies the login flow', () => {
     cy.clock(new Date('2023-12-20T01:04:33.907518411Z'));
     cy.intercept(

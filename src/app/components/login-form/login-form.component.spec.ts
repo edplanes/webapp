@@ -45,13 +45,13 @@ describe('LoginFormComponent', () => {
       })
     );
     spyOnProperty(component.form, 'valid').and.returnValue(true);
-
-    component.onSubmit();
-
     component.loginSuccess.subscribe({
       next: (val: boolean) => {
         expect(val).toBeTruthy();
       },
+      error: (err: Error) => expect(err).not.toBeDefined(),
     });
+
+    component.onSubmit();
   });
 });

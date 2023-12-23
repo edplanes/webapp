@@ -12,6 +12,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { RouterModule } from '@angular/router';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-login-form',
@@ -30,11 +31,11 @@ import { RouterModule } from '@angular/router';
 })
 export class LoginFormComponent {
   form: FormGroup;
-  loginError: Error | null = null;
   @Output() public loginSuccess = new EventEmitter<boolean>();
 
   constructor(
     private authService: AuthService,
+    private snackBar: MatSnackBar,
     fb: FormBuilder
   ) {
     this.form = fb.group({
@@ -51,10 +52,11 @@ export class LoginFormComponent {
     const val = this.form.value;
     this.authService.login(val.email, val.password).subscribe({
       next: () => {
-        this.loginSuccess.emit(true);
+        this.snackBar.dismiss();
+        this.loginSuccess.next(true);
       },
       error: (err: Error) => {
-        this.loginError = err;
+        this.snackBar.open(err.message, '', { duration: 2500 });
       },
     });
   }
