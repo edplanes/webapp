@@ -103,7 +103,7 @@ describe('Auth API Client', () => {
         .register('admin', 'epkt', 'admin@localhost.com', 'some-password')
         .subscribe({
           error: (err: HttpErrorResponse) => {
-            expect(err.status).toEqual(409);
+            expect(err.status).toEqual(403);
           },
         });
       httpController
@@ -112,8 +112,8 @@ describe('Auth API Client', () => {
           url: '/auth',
         })
         .flush('User already exists', {
-          status: 409,
-          statusText: 'Conflict',
+          status: 403,
+          statusText: 'Forbidden',
         });
     });
   });
