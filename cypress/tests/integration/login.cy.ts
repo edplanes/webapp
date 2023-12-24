@@ -1,4 +1,4 @@
-import { setLocalStorageUser } from '../support/e2e';
+import { setLocalStorageUser } from '../../support/e2e';
 
 describe('Login Page', () => {
   before(() => {

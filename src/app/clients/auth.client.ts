@@ -1,25 +1,15 @@
 import { Injectable } from '@angular/core';
-import { ConfigService } from '../services/config/config.service';
-import { Observable, first, map } from 'rxjs';
+import { Observable } from 'rxjs';
 import { IAuthInfo, IUser } from '../models/auth.model';
 import { HttpClient } from '@angular/common/http';
+import { APIClient } from '../shared/APIClient';
 
 @Injectable({
   providedIn: 'root',
 })
-export class AuthClient {
-  private apiServerBaseUrl: string = '';
-
-  constructor(
-    private http: HttpClient,
-    configService: ConfigService
-  ) {
-    configService.state$
-      .pipe(
-        first(config => config.isLoaded),
-        map(({ data }) => data)
-      )
-      .subscribe(config => (this.apiServerBaseUrl = config?.apiServer || ''));
+export class AuthClient extends APIClient {
+  constructor(private http: HttpClient) {
+    super();
   }
 
   login(email: string, password: string) {

@@ -11,6 +11,7 @@ export interface AirportLocation {
 
 export interface Airport {
   icao: string;
+  iata?: string;
   city: string;
   location: AirportLocation;
   name: string;
