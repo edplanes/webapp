@@ -1,11 +1,11 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import {
-  BehaviorSubject,
   Observable,
   ObservableInput,
   catchError,
   first,
+  of,
   throwError,
 } from 'rxjs';
 import { IAuthInfo } from '../../models/auth.model';
@@ -36,11 +36,8 @@ export const authGuard: CanActivateFn = (
   providedIn: 'root',
 })
 export class AuthService {
-  private authSub: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(
-    false
-  );
   public get isAuthenticated(): Observable<boolean> {
-    return this.authSub.asObservable();
+    return of(this.isLoggedIn());
   }
 
   constructor(

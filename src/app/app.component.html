@@ -1,7 +1,62 @@
-<header>
-  <app-header [isHeadless]="isHeadless"></app-header>
-</header>
-
-<main>
-  <router-outlet></router-outlet>
-</main>
+<mat-toolbar color="primary">
+  <mat-toolbar-row fxLayout fxLayoutAlign="space-between center">
+    <button mat-button class="brand" [routerLink]="'/'">
+      <span>EdPlanes</span>
+    </button>
+    <div fxHide.lt-sm="true">
+      <mat-icon>access_time</mat-icon>&nbsp;{{
+        currentUTCTime | date: 'HH:mm'
+      }}&nbsp;zulu
+    </div>
+    <div fxHide.lt-sm="true">
+      <mat-icon>access_time</mat-icon>&nbsp;
+      {{ currentTime | date: 'HH:mm' }}&nbsp; local
+    </div>
+    <mat-slide-toggle [formControl]="toogleControl" class="mr-8 theme-switch">
+    </mat-slide-toggle>
+  </mat-toolbar-row>
+  @if (!isHeadless) {
+    <mat-toolbar-row fxLayout fxLayoutAlign="space-between center">
+      <div fxShow="true" fxHide.gt-sm="true">
+        <button mat-icon-button (click)="sidenav.toggle()">
+          <mat-icon>menu</mat-icon>
+        </button>
+      </div>
+      <nav fxShow="true" fxHide.lt-md="true">
+        @for (item of displayedPaths; track $index) {
+          <span
+            [routerLink]="item.path"
+            routerLinkActive
+            #rla="routerLinkActive">
+            @if (rla.isActive) {
+              <button mat-raised-button [routerLink]="item.path">
+                {{ item.displayName }}
+              </button>
+            } @else {
+              <button mat-button [routerLink]="item.path">
+                {{ item.displayName }}
+              </button>
+            }
+          </span>
+        }
+      </nav>
+    </mat-toolbar-row>
+  }
+</mat-toolbar>
+<mat-sidenav-container fxFlexFill>
+  <mat-sidenav
+    color="primary"
+    #sidenav
+    fxLayout="column"
+    mode="over"
+    opened="false">
+    <div fxLayout="column">
+      @for (item of displayedPaths; track $index) {
+        <a mat-button [routerLink]="item.path">{{ item.displayName }}</a>
+      }
+    </div>
+  </mat-sidenav>
+  <mat-sidenav-content fxFlexFill>
+    <router-outlet></router-outlet>
+  </mat-sidenav-content>
+</mat-sidenav-container>
