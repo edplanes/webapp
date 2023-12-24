@@ -42,12 +42,12 @@ export class LogService {
           return publish;
         });
 
-      if (publishers.length == 0) {
-        publishers.push(new LogConsole());
-      }
-
       this.publishers = publishers;
     });
+
+    if (this.publishers.length == 0) {
+      this.publishers.push(new LogConsole());
+    }
   }
 
   debug(msg: string, ...params: unknown[]) {
@@ -55,19 +55,19 @@ export class LogService {
   }
 
   info(msg: string, ...params: unknown[]) {
-    this.writeLog(msg, LogLevel.Debug, params);
+    this.writeLog(msg, LogLevel.Info, params);
   }
 
   warn(msg: string, ...params: unknown[]) {
-    this.writeLog(msg, LogLevel.Debug, params);
+    this.writeLog(msg, LogLevel.Warn, params);
   }
 
   error(msg: string, ...params: unknown[]) {
-    this.writeLog(msg, LogLevel.Debug, params);
+    this.writeLog(msg, LogLevel.Error, params);
   }
 
   fatal(msg: string, ...params: unknown[]) {
-    this.writeLog(msg, LogLevel.Debug, params);
+    this.writeLog(msg, LogLevel.Fatal, params);
   }
 
   log(msg: string, ...params: unknown[]) {
