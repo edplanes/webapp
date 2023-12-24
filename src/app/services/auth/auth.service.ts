@@ -61,7 +61,16 @@ export class AuthService {
     );
   }
 
-  register() {}
+  register(
+    username: string,
+    homeAiportIcao: string,
+    email: string,
+    password: string
+  ) {
+    return this.authClient
+      .register(username, homeAiportIcao, email, password)
+      .pipe(catchError(this.handleError.bind(this)));
+  }
 
   logout() {
     localStorage.removeItem('id_token');
@@ -100,7 +109,7 @@ export class AuthService {
     );
 
     switch (errorResponse.status) {
-      case 409:
+      case 403:
         this.logger.info(`user already exists: ${errorResponse.error}`);
         return throwError(() => new UserAlreadyExists());
       case 404:

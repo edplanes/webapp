@@ -72,7 +72,13 @@ export class RegisterFormComponent implements OnInit {
   }
 
   onSubmit() {
-    this.authService.register();
+    const data = this.form.value;
+    this.authService.register(
+      data.username,
+      data.homeAirport.icao,
+      data.email,
+      data.password
+    );
   }
 
   displayAirport(airport: Airport): string {
