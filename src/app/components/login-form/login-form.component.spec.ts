@@ -40,6 +40,8 @@ describe('LoginFormComponent', () => {
         payload: {
           email: 'test@local.host',
           id: 'some-id',
+          username: 'admin',
+          roles: [],
         },
         expiresAt: Date.now(),
       })

@@ -57,7 +57,7 @@ export class AppComponent implements OnInit {
     private authService: AuthService,
     private route: ActivatedRoute
   ) {
-    authService.isAuthenticated.subscribe(value => {
+    this.authService.isLoggedIn().subscribe(value => {
       this.displayedPaths = this.getMenuPaths(value);
     });
   }

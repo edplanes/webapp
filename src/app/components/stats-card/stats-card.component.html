@@ -8,31 +8,43 @@
   <mat-divider></mat-divider>
   <mat-card-content fxLayout="row" fxLayoutAlign="space-between center">
     <div fxLayout="column" fxLayoutAlign="center center" class="stats-wrapper">
-      <div class="stats">78</div>
+      <div data-cy="pireps" class="stats">
+        {{ statistics?.pilotReportsCount || 0 }}
+      </div>
       <mat-card-subtitle>PIREPS Filed</mat-card-subtitle>
     </div>
     <div fxLayout="column" fxLayoutAlign="center center" class="stats-wrapper">
-      <div class="stats">-191 FPM</div>
+      <div data-cy="avgLandingRate" class="stats">
+        @if (statistics?.averageLandingRate) {
+          {{ statistics?.averageLandingRate }} FPM
+        } @else {
+          Not Available
+        }
+      </div>
       <mat-card-subtitle>Average Landing Rate</mat-card-subtitle>
     </div>
     <div fxLayout="column" fxLayoutAlign="center center" class="stats-wrapper">
-      <div class="stats">137:27:01</div>
+      <div data-cy="inFlightTime" class="stats">{{ inFlightTime }}</div>
       <mat-card-subtitle>In Flight Time</mat-card-subtitle>
     </div>
     <div fxLayout="column" fxLayoutAlign="center center" class="stats-wrapper">
-      <div class="stats">11000</div>
+      <div data-cy="points" class="stats">
+        {{ statistics?.earnedPoints || 0 }}
+      </div>
       <mat-card-subtitle>Earned Points</mat-card-subtitle>
     </div>
     <div fxLayout="column" fxLayoutAlign="center center" class="stats-wrapper">
-      <div class="stats">EPKT/KTW</div>
+      <div data-cy="currentLocation" class="stats">{{ currentLocation }}</div>
       <mat-card-subtitle>Current Location</mat-card-subtitle>
     </div>
     <div fxLayout="column" fxLayoutAlign="center center" class="stats-wrapper">
-      <div class="stats">2000</div>
+      <div data-cy="averagePoints" class="stats">{{ averagePoints }}</div>
       <mat-card-subtitle>Average Earned Points</mat-card-subtitle>
     </div>
     <div fxLayout="column" fxLayoutAlign="center center" class="stats-wrapper">
-      <div class="stats">A320 neo</div>
+      <div data-cy="mostFlownAircraft" class="stats">
+        {{ statistics?.mostFlownAircraftType || 'Unknown' }}
+      </div>
       <mat-card-subtitle>Most Flown Aircrat Type</mat-card-subtitle>
     </div>
   </mat-card-content>

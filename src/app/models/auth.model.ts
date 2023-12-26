@@ -1,6 +1,8 @@
 export interface IUser {
   email: string;
   id: string;
+  username: string;
+  roles: string[];
 }
 
 export interface IAuthInfo {

@@ -45,6 +45,7 @@ export class LoginFormComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    console.log('authenticated', this.authService.isAuthenticated);
     if (this.authService.isAuthenticated) {
       this.loginSuccess.next(true);
     }

@@ -1,14 +1,15 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import {
+  BehaviorSubject,
   Observable,
   ObservableInput,
   catchError,
   first,
-  of,
+  map,
   throwError,
 } from 'rxjs';
-import { IAuthInfo } from '../../models/auth.model';
+import { IAuthInfo, IUser } from '../../models/auth.model';
 import {
   ActivatedRouteSnapshot,
   CanActivateFn,
@@ -24,7 +25,7 @@ export const authGuard: CanActivateFn = (
   route: ActivatedRouteSnapshot,
   state: RouterStateSnapshot
 ) => {
-  if (inject(AuthService).isLoggedIn()) return true;
+  if (inject(AuthService).isAuthenticated) return true;
 
   inject(Router).navigate(['/login'], {
     queryParams: { returnUrl: state.url },
@@ -36,14 +37,32 @@ export const authGuard: CanActivateFn = (
   providedIn: 'root',
 })
 export class AuthService {
-  public get isAuthenticated(): Observable<boolean> {
-    return of(this.isLoggedIn());
+  private authState: BehaviorSubject<IAuthInfo | undefined> =
+    new BehaviorSubject<IAuthInfo | undefined>(undefined);
+  public get authenticatedUser(): IUser | undefined {
+    if (!this.isAuthenticated) return undefined;
+
+    return this.authState.getValue()?.payload;
+  }
+  public get isAuthenticated(): boolean {
+    const state = this.authState.getValue();
+    return !!(Date.now() < (state?.expiresAt || 0) && state?.token);
   }
 
   constructor(
     private logger: LogService,
     private authClient: AuthClient
-  ) {}
+  ) {
+    if (localStorage.getItem('id_token')) {
+      const authInfo: IAuthInfo = {
+        token: localStorage.getItem('id_token')!,
+        payload: JSON.parse(localStorage.getItem('user')!),
+        expiresAt: JSON.parse(localStorage.getItem('expires_at')!),
+      };
+
+      this.authState.next(authInfo);
+    }
+  }
 
   login(email: string, password: string) {
     return this.authClient.login(email, password).pipe(
@@ -75,15 +94,16 @@ export class AuthService {
     localStorage.removeItem('user');
   }
 
-  isLoggedIn() {
-    return Date.now() < this.getExpiration();
-  }
-
-  isLoggedOut() {
-    return !this.isLoggedIn();
+  isLoggedIn(): Observable<boolean> {
+    return this.authState
+      .asObservable()
+      .pipe(
+        map(info => !!((info?.expiresAt || 0) > Date.now() && info?.token))
+      );
   }
 
   private setSession(authResult: IAuthInfo) {
+    this.authState.next(authResult);
     localStorage.setItem('id_token', authResult.token);
     localStorage.setItem(
       'expires_at',
@@ -93,9 +113,7 @@ export class AuthService {
   }
 
   private getExpiration() {
-    const expiry = localStorage.getItem('expires_at')!;
-    const expiresAt: number = JSON.parse(expiry);
-    return expiresAt;
+    return this.authState.getValue()?.expiresAt;
   }
 
   private handleError(

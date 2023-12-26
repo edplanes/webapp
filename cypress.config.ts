@@ -5,7 +5,6 @@ export default defineConfig({
   video: true,
   e2e: {
     baseUrl: 'http://localhost:4200',
-    specPattern: 'cypress/tests/**/*.cy.ts',
     experimentalRunAllSpecs: true,
     setupNodeEvents(on) {
       on(

@@ -31,6 +31,8 @@ describe('Auth API Client', () => {
         payload: {
           email: 'test@email.local',
           id: 'some-id',
+          username: 'admin',
+          roles: [],
         },
         expiresAt: 1703197072786,
       };
@@ -82,6 +84,8 @@ describe('Auth API Client', () => {
       const user: IUser = {
         id: 'some-id',
         email: 'admin@localhost.com',
+        username: 'admin',
+        roles: [],
       };
 
       client.register('admin', 'epkt', user.email, 'some-password').subscribe({

@@ -1,0 +1,19 @@
+{
+  "pilotReportsCount": 2,
+  "averageLandingRate": -191,
+  "inFlightSeconds": 6000,
+  "earnedPoints": 195,
+  "currentLocation": {
+    "icao": "epgd",
+    "iata": "gdn",
+    "city": "Gdańsk",
+    "location": {
+      "lat": 54.377601623535156,
+      "lon": 18.46619987487793,
+      "elev": 489
+    },
+    "name": "Gdańsk Lech Wałęsa Airport",
+    "score": 3
+  },
+  "mostFlownAircraftType": "B738"
+}

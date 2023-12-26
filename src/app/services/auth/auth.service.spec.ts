@@ -1,10 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 
 import { AuthService } from './auth.service';
-import {
-  HttpClientTestingModule,
-  HttpTestingController,
-} from '@angular/common/http/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { HttpErrorResponse } from '@angular/common/http';
 import { IAuthInfo, IUser } from '../../models/auth.model';
 import { LogService } from '../log/log.service';
@@ -16,7 +13,6 @@ import { UserAlreadyExists } from '../../shared/errors/UserAlreadyExists';
 describe('AuthService', () => {
   let service: AuthService;
   let authClient: AuthClient;
-  let httpController: HttpTestingController;
   let observableNextSpy: jasmine.Spy;
   let observableErrorSpy: jasmine.Spy;
 
@@ -27,13 +23,8 @@ describe('AuthService', () => {
     });
     authClient = TestBed.inject(AuthClient);
     service = TestBed.inject(AuthService);
-    httpController = TestBed.inject(HttpTestingController);
     observableNextSpy = jasmine.createSpy('nextSpy');
     observableErrorSpy = jasmine.createSpy('errorSpy');
-  });
-
-  afterEach(() => {
-    httpController.verify();
   });
 
   it('should be created', () => {
@@ -53,6 +44,8 @@ describe('AuthService', () => {
         payload: {
           email: 'test@email.local',
           id: 'some-id',
+          username: 'admin',
+          roles: [],
         },
         expiresAt: 1703197072786,
       };
@@ -85,6 +78,8 @@ describe('AuthService', () => {
         payload: {
           email: 'test@email.local',
           id: 'some-id',
+          username: 'admin',
+          roles: [],
         },
         expiresAt: 1703197072786,
       };
@@ -113,6 +108,8 @@ describe('AuthService', () => {
       const expectedUser: IUser = {
         id: 'some-id',
         email: 'test@localhost.com',
+        username: 'admin',
+        roles: [],
       };
       authClientSpy.and.returnValue(of(expectedUser));
 

@@ -1,4 +1,4 @@
-import { setLocalStorageUser } from '../../support/e2e';
+import { setLocalStorageUser } from '../support/e2e';
 
 describe('Login Page', () => {
   before(() => {
@@ -73,6 +73,7 @@ describe('Login Page', () => {
             id: '6581e06d5e8a2548bfb4bc96',
             username: 'admin',
             email: 'admin@localhost.com',
+            roles: ['ROLE_AREA_MANAGER'],
           },
         });
       }
