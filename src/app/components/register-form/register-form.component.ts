@@ -1,3 +1,4 @@
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { Component, OnInit } from '@angular/core';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import {
@@ -11,7 +12,6 @@ import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
-import { Router } from '@angular/router';
 import {
   Airport,
   AirportService,
@@ -21,6 +21,7 @@ import { AsyncPipe } from '@angular/common';
 import { CustomValidators } from '../../customValidators';
 import { MatIconModule } from '@angular/material/icon';
 import { AuthService } from '../../services/auth/auth.service';
+import { LogService } from '../../services/log/log.service';
 
 @Component({
   selector: 'app-register-form',
@@ -48,7 +49,8 @@ export class RegisterFormComponent implements OnInit {
     private fb: FormBuilder,
     private airportsService: AirportService,
     private authService: AuthService,
-    private router: Router
+    private logger: LogService,
+    private snackBar: MatSnackBar
   ) {
     this.form = this.fb.group(
       {
@@ -64,21 +66,29 @@ export class RegisterFormComponent implements OnInit {
   ngOnInit(): void {
     this.form.controls['homeAirport'].valueChanges
       .pipe(startWith(''))
-      .subscribe(value =>
-        this.airportsService.searchAirport(value).subscribe(aiports => {
-          this.filteredAirports = of(aiports);
-        })
+      .subscribe(
+        value =>
+          typeof value === 'string' &&
+          this.airportsService.searchAirport(value).subscribe(aiports => {
+            this.filteredAirports = of(aiports);
+          })
       );
   }
 
   onSubmit() {
+    if (!this.form.valid) {
+      this.logger.debug('Register form is invalid', this.form.value);
+      return;
+    }
+
     const data = this.form.value;
-    this.authService.register(
-      data.username,
-      data.homeAirport.icao,
-      data.email,
-      data.password
-    );
+    this.authService
+      .register(data.username, data.homeAirport.icao, data.email, data.password)
+      .subscribe({
+        next: () => this.snackBar.open('User registered successfully'),
+        error: error =>
+          this.snackBar.open(`Failed to register user: ${error}`, 'Ok'),
+      });
   }
 
   displayAirport(airport: Airport): string {

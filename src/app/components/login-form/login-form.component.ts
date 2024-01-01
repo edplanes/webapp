@@ -13,6 +13,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { RouterModule } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { LogService } from '../../services/log/log.service';
 
 @Component({
   selector: 'app-login-form',
@@ -36,6 +37,7 @@ export class LoginFormComponent implements OnInit {
   constructor(
     private authService: AuthService,
     private snackBar: MatSnackBar,
+    private logger: LogService,
     fb: FormBuilder
   ) {
     this.form = fb.group({
@@ -45,7 +47,10 @@ export class LoginFormComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log('authenticated', this.authService.isAuthenticated);
+    this.logger.debug(
+      'Initializing login form with user authenticated: ',
+      this.authService.isAuthenticated
+    );
     if (this.authService.isAuthenticated) {
       this.loginSuccess.next(true);
     }

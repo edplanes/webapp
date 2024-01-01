@@ -6,6 +6,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
 import { Airport } from '../../services/airports/airport.service';
 import { AuthService } from '../../services/auth/auth.service';
+import { of } from 'rxjs';
 
 describe('RegisterFormComponent', () => {
   let component: RegisterFormComponent;
@@ -52,10 +53,22 @@ describe('RegisterFormComponent', () => {
   });
 
   it('should call auth service register method', () => {
-    const authRegisterSpy = spyOn(authService, 'register');
+    const authRegisterSpy = spyOn(authService, 'register').and.returnValue(
+      of()
+    );
+    spyOnProperty(component.form, 'valid').and.returnValue(true);
 
     component.onSubmit();
 
     expect(authRegisterSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('should prevent registration call when form is invalid', () => {
+    const authRegisterSpy = spyOn(authService, 'register');
+    spyOnProperty(component.form, 'valid').and.returnValue(false);
+
+    component.onSubmit();
+
+    expect(authRegisterSpy).not.toHaveBeenCalled();
   });
 });

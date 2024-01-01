@@ -23,7 +23,7 @@ export function setLocalStorageUser() {
   );
   window.localStorage.setItem(
     'user',
-    '{"id":"6581e06d5e8a2548bfb4bc96","username":"admin","email":"admin@localhost.com"}'
+    '{"id":"6581e06d5e8a2548bfb4bc96","username":"admin","email":"admin@localhost.com", "roles": ["ADMIN"]}'
   );
   window.localStorage.setItem('expires_at', '1703052273907');
 }

@@ -92,6 +92,7 @@ export class AuthService {
     localStorage.removeItem('id_token');
     localStorage.removeItem('expires_at');
     localStorage.removeItem('user');
+    this.authState.next(undefined);
   }
 
   isLoggedIn(): Observable<boolean> {
@@ -130,6 +131,9 @@ export class AuthService {
       case 404:
         this.logger.info(`user not found: ${errorResponse.error}`);
         return throwError(() => new UserNotFound());
+      case 401:
+        this.logger.info(`unauthorized: ${errorResponse.error}`);
+        return throwError(() => new Error('Bad credentials provided'));
       default:
         this.logger.fatal(`unknown error code received!`, errorResponse);
         return throwError(() => new Error('unknown error received'));

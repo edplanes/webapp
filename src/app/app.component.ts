@@ -16,7 +16,9 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatMenuModule } from '@angular/material/menu';
 import { AuthService } from './services/auth/auth.service';
+import { MatDividerModule } from '@angular/material/divider';
 
 interface NavigationOption {
   path: string;
@@ -37,6 +39,8 @@ interface NavigationOption {
     ReactiveFormsModule,
     RouterModule,
     MatSidenavModule,
+    MatMenuModule,
+    MatDividerModule,
   ],
   providers: [LogService],
   templateUrl: './app.component.html',
@@ -51,6 +55,20 @@ export class AppComponent implements OnInit {
   subscription: Subscription = new Subscription();
   displayedPaths: NavigationOption[] = [];
   toogleControl = new FormControl(this.prefersDarkMode());
+
+  get isDispatcher() {
+    const roles = this.authService.authenticatedUser?.roles;
+    return (
+      roles &&
+      (roles.includes('ADMIN') ||
+        roles.includes('DISPATCHER') ||
+        roles.includes('MANAGEMENT'))
+    );
+  }
+
+  get currentUser() {
+    return this.authService.authenticatedUser;
+  }
 
   constructor(
     private router: Router,
@@ -86,6 +104,11 @@ export class AppComponent implements OnInit {
             /(login|register)(?:\?returnUrl=.*)?$/
           ))
       );
+  }
+
+  logout() {
+    this.authService.logout();
+    this.router.navigateByUrl('/');
   }
 
   private prefersDarkMode() {
