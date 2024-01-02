@@ -1,7 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import {
-  BehaviorSubject,
   Observable,
   ObservableInput,
   catchError,
@@ -20,12 +19,15 @@ import { LogService } from '../log/log.service';
 import { UserAlreadyExists } from '../../shared/errors/UserAlreadyExists';
 import { UserNotFound } from '../../shared/errors/UserNotFound';
 import { AuthClient } from '../../clients/auth.client';
+import { AuthState } from './authState';
 
 export const authGuard: CanActivateFn = (
   route: ActivatedRouteSnapshot,
   state: RouterStateSnapshot
 ) => {
-  if (inject(AuthService).isAuthenticated) return true;
+  const authService = inject(AuthService);
+  console.log(authService.isAuthenticated);
+  if (authService.isAuthenticated) return true;
 
   inject(Router).navigate(['/login'], {
     queryParams: { returnUrl: state.url },
@@ -37,8 +39,8 @@ export const authGuard: CanActivateFn = (
   providedIn: 'root',
 })
 export class AuthService {
-  public readonly authState: BehaviorSubject<IAuthInfo | undefined> =
-    new BehaviorSubject<IAuthInfo | undefined>(undefined);
+  public readonly authState: AuthState = AuthState.getInstance();
+
   public get authenticatedUser(): IUser | undefined {
     if (!this.isAuthenticated) return undefined;
 

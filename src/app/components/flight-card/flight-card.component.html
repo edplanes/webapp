@@ -1,0 +1,23 @@
+<mat-card>
+  <mat-card-header fxLayout fxLayoutAlign="space-between center">
+    <mat-card-title>
+      <mat-icon>flight_takeoff</mat-icon>
+      {{ isNextFlight ? 'Next' : 'Last' }} flight
+    </mat-card-title>
+  </mat-card-header>
+  <mat-divider></mat-divider>
+  <mat-card-content fxLayout fxLayoutAlign="center center">
+    @if (!nextFlight) {
+      @if (isNextFlight) {
+        <button
+          mat-raised-button
+          color="accent"
+          (click)="openBookFlightDialog()">
+          Book Flight
+        </button>
+      } @else {
+        <mat-icon>sentiment_dissatisfied</mat-icon>&nbsp; No flights found yet!
+      }
+    }
+  </mat-card-content>
+</mat-card>

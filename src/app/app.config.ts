@@ -10,6 +10,7 @@ import {
 } from '@angular/common/http';
 import { AuthInterceptor } from './services/auth/auth.interceptor';
 import { ConfigService } from './services/config/config.service';
+import { AuthState } from './services/auth/authState';
 
 export function initializeApp() {
   const configService = inject(ConfigService);
@@ -27,6 +28,10 @@ export const appConfig: ApplicationConfig = {
       provide: APP_INITIALIZER,
       useFactory: initializeApp,
       multi: true,
+    },
+    {
+      provide: AuthState,
+      useValue: AuthState.getInstance(),
     },
   ],
 };

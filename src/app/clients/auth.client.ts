@@ -1,17 +1,12 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { IAuthInfo, IUser } from '../models/auth.model';
-import { HttpClient } from '@angular/common/http';
 import { APIClient } from '../shared/APIClient';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthClient extends APIClient {
-  constructor(private http: HttpClient) {
-    super();
-  }
-
   login(email: string, password: string) {
     return this.http.get<IAuthInfo>(`${this.apiServerBaseUrl}/auth`, {
       headers: {
