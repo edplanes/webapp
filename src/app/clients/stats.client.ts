@@ -22,7 +22,7 @@ export class StatsClient extends APIClient {
 
   getBasicStatisticts(userId: string) {
     return this.http.get<StatisticsDTO>(
-      `${this.apiServerBaseUrl}/user/${userId}/stats`
+      `${this.apiServerBaseUrl}/users/${userId}/stats`
     );
   }
 }

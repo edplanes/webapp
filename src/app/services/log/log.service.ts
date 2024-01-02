@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { LogConsole, LogPublisher } from './log-publishers';
 import { ConfigService } from '../config/config.service';
 
@@ -19,8 +19,11 @@ export class LogService {
   level: LogLevel = LogLevel.All;
   logDate: boolean = true;
   publishers: LogPublisher[] = [];
+  visitorId = localStorage.getItem('visitorId') || this.generateVisitorId();
 
-  constructor(configService: ConfigService) {
+  constructor(configService?: ConfigService) {
+    if (!configService) configService = inject(ConfigService);
+
     configService.state$.subscribe(state => {
       if (!state.isLoaded || !state.data?.logger) return;
 
@@ -81,9 +84,16 @@ export class LogService {
     entry.message = msg;
     entry.level = level;
     entry.extraInfo = params;
+    entry.visitorId = this.visitorId;
     entry.logWithDate = this.logDate;
 
     this.publishers.forEach(logger => logger.log(entry).subscribe(() => {}));
+  }
+
+  private generateVisitorId(): string {
+    const id = crypto.randomUUID();
+    localStorage.setItem('visitorId', id);
+    return id;
   }
 
   private shouldLog(level: LogLevel) {
@@ -98,6 +108,7 @@ export class LogEntry {
   entryDate: Date = new Date();
   message: string = '';
   level: LogLevel = LogLevel.Debug;
+  visitorId: string = '';
   extraInfo: unknown[] = [];
   logWithDate: boolean = true;
 

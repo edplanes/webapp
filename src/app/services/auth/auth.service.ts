@@ -37,7 +37,7 @@ export const authGuard: CanActivateFn = (
   providedIn: 'root',
 })
 export class AuthService {
-  private authState: BehaviorSubject<IAuthInfo | undefined> =
+  public readonly authState: BehaviorSubject<IAuthInfo | undefined> =
     new BehaviorSubject<IAuthInfo | undefined>(undefined);
   public get authenticatedUser(): IUser | undefined {
     if (!this.isAuthenticated) return undefined;

@@ -35,7 +35,9 @@ export class LogConsole extends LogPublisher {
       message += record.entryDate.toDateString();
     }
 
-    message += ` [${LogLevel[record.level].toUpperCase()}] ${record.message}`;
+    message += ` [${LogLevel[record.level].toUpperCase()}] [${
+      record.visitorId
+    }] ${record.message}`;
 
     let params = record.extraInfo;
     if (params.length) {
