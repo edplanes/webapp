@@ -4,9 +4,9 @@ import { ConfigService } from '../config/config.service';
 import { HttpClient } from '@angular/common/http';
 
 export interface AirportLocation {
-  lat: number;
-  lon: number;
-  elev: number;
+  latitude: number;
+  longitude: number;
+  elevation: number;
 }
 
 export interface Airport {

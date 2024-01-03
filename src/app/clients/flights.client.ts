@@ -35,5 +35,10 @@ export class FlightsClient extends APIClient {
     );
   }
 
-  bookFlight() {}
+  bookFlight(userId: string, flight: unknown) {
+    return this.http.post(
+      `${this.apiServerBaseUrl}/users/${userId}/flights`,
+      flight
+    );
+  }
 }

@@ -27,6 +27,8 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { NgxMatTimepickerModule } from 'ngx-mat-timepicker';
 import { Aircraft } from '../../clients/aircrafts.client';
 import { AircraftsService } from '../../services/aircrafts/aircrafts.service';
+import { FlightsService } from '../../services/flights/flights.service';
+import { DurationPickerDirective } from '../../directives/duration-picker/duration-picker.directive';
 
 @Component({
   selector: 'app-flight-booking',
@@ -46,6 +48,7 @@ import { AircraftsService } from '../../services/aircrafts/aircrafts.service';
     FlexLayoutModule,
     MatAutocompleteModule,
     NgxMatTimepickerModule,
+    DurationPickerDirective,
   ],
   templateUrl: './flight-booking.component.html',
   styleUrl: './flight-booking.component.scss',
@@ -65,6 +68,7 @@ export class FlightBookingComponent implements OnInit {
   constructor(
     private dialogRef: MatDialogRef<FlightBookingComponent>,
     private airportService: AirportService,
+    private flightsService: FlightsService,
     private aircraftService: AircraftsService,
     fb: FormBuilder
   ) {
@@ -74,39 +78,51 @@ export class FlightBookingComponent implements OnInit {
       arrival: ['', Validators.required],
       aircraft: ['', Validators.required],
       departureTime: ['', Validators.required],
+      duration: [
+        '01:00',
+        [Validators.required, Validators.pattern(/[0-9]{2}:[0-9]{2}/)],
+      ],
     });
   }
 
   ngOnInit(): void {
     this.detailsForm.controls['departure'].valueChanges
       .pipe(startWith(''))
-      .subscribe(
-        value =>
-          typeof value == 'string' &&
+      .subscribe(value => {
+        typeof value == 'string' &&
           this.airportService.searchAirport(value).subscribe(airports => {
             this.filteredDepartures = airports;
-          })
-      );
+          });
+
+        typeof value == 'object' && this.updateFlightDuration();
+      });
 
     this.detailsForm.controls['arrival'].valueChanges
       .pipe(startWith(''))
-      .subscribe(
-        value =>
-          typeof value == 'string' &&
+      .subscribe(value => {
+        typeof value == 'string' &&
           this.airportService.searchAirport(value).subscribe(airports => {
             this.filteredArrivals = airports;
-          })
-      );
+          });
+        typeof value == 'object' && this.updateFlightDuration();
+      });
 
     this.detailsForm.controls['aircraft'].valueChanges
       .pipe(startWith(''))
-      .subscribe(
-        value =>
-          typeof value == 'string' &&
+      .subscribe(value => {
+        typeof value == 'string' &&
           this.aircraftService.searchAircraft(value).subscribe(aircraft => {
             this.filteredAircrafts = aircraft;
-          })
-      );
+          });
+        typeof value == 'object' && this.updateFlightDuration();
+      });
+  }
+
+  onSubmit() {
+    if (this.detailsForm.invalid) return;
+
+    this.flightsService.bookFlight(this.detailsForm.value);
+    this.dialogRef.close();
   }
 
   selectFlightType(flightType: string) {
@@ -115,10 +131,9 @@ export class FlightBookingComponent implements OnInit {
 
     if (this.skipRouteSelection) {
       // Workaround until: https://github.com/angular/components/issues/17294
-      setTimeout(() => this.stepper!.steps.get(3)?.select(), 1);
-    } else {
-      this.stepper!.next();
+      setTimeout(() => this.stepper!.steps.get(2)?.select(), 10);
     }
+    this.stepper!.next();
   }
 
   displayAirport(airport: Airport): string {
@@ -131,6 +146,36 @@ export class FlightBookingComponent implements OnInit {
       `${aircraft.airframe.icao.toUpperCase()} - ${aircraft.name} - ${
         aircraft.airframe.name
       }`
+    );
+  }
+
+  private updateFlightDuration() {
+    const departure = this.detailsForm.controls['departure'].value;
+    const arrival = this.detailsForm.controls['arrival'].value;
+    const aircraft = this.detailsForm.controls['aircraft'].value;
+
+    if (
+      typeof departure !== 'object' ||
+      typeof arrival !== 'object' ||
+      typeof aircraft !== 'object'
+    ) {
+      return;
+    }
+
+    let flightTime = this.flightsService.calculateFlightTime(
+      departure,
+      arrival,
+      aircraft
+    );
+
+    const flightHours = Math.floor(flightTime / 60);
+    flightTime %= 60;
+    const flightMinutes = Math.floor(flightTime);
+
+    this.detailsForm.controls['duration'].setValue(
+      String(flightHours).padStart(2, '0') +
+        ':' +
+        String(flightMinutes).padStart(2, '0')
     );
   }
 }
