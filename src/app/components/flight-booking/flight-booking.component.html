@@ -93,16 +93,15 @@
             }
           </mat-autocomplete>
         </mat-form-field>
-        <mat-form-field>
+        <mat-form-field (click)="helloInput.showPicker()">
           <mat-label>Departure Time</mat-label>
           <input
+            type="datetime-local"
             matInput
-            [ngxMatTimepicker]="picker"
-            [format]="24"
-            formControlName="departureTime"
-            type="time"
-            placeholder="12:00" />
-          <ngx-mat-timepicker appendToInput="true" #picker></ngx-mat-timepicker>
+            #helloInput
+            formControlName="departureTime" />
+
+          <mat-icon matSuffix fontIcon="today" />
         </mat-form-field>
         <mat-form-field>
           <mat-label>Flight Duration</mat-label>

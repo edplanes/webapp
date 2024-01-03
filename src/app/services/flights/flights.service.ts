@@ -8,6 +8,7 @@ import { UnexpectedError } from '../../shared/errors/UnexpectedError';
 import { Airport } from '../airports/airport.service';
 import { Aircraft } from '../../clients/aircrafts.client';
 import { LogService } from '../log/log.service';
+import dayjs from 'dayjs';
 
 @Injectable({
   providedIn: 'root',
@@ -30,9 +31,15 @@ export class FlightsService {
   bookFlight(flight: FlightInput) {
     const userId = this.authState.getValue()!.payload.id;
 
+    this.logger.debug(`Creating new flight for user ${userId}`, flight);
+
     this.flightsClient
       .bookFlight(userId, this.mapFlightInputToFlight(flight))
       .subscribe();
+  }
+
+  cancelFlight(flightId: string) {
+    return this.flightsClient.cancelFlight(flightId);
   }
 
   calculateFlightTime(
@@ -44,12 +51,7 @@ export class FlightsService {
     const taxiTakeoffTime =
       this.calculateTaxiTime(airport1) + this.calculateTaxiTime(airport2);
 
-    const distance = this.calculateDistance(
-      airport1.location.latitude,
-      airport1.location.longitude,
-      airport2.location.latitude,
-      airport2.location.longitude
-    );
+    const distance = this.calculateAirportsDistance(airport1, airport2);
 
     const flightTime =
       (distance / (aircraft.airframe.defaults.cruiseTAS * 1.852)) * 60;
@@ -63,6 +65,15 @@ export class FlightsService {
     );
 
     return totalFlightTimeInMinutes;
+  }
+
+  calculateAirportsDistance(airport1: Airport, airport2: Airport) {
+    return this.calculateDistance(
+      airport1.location.latitude,
+      airport1.location.longitude,
+      airport2.location.latitude,
+      airport2.location.longitude
+    );
   }
 
   private calculateDistance(
@@ -113,6 +124,9 @@ export class FlightsService {
   }
 
   private mapFlightInputToFlight(flightIn: FlightInput): unknown {
+    const durationMinutes = this.convertDurationStringToNumber(
+      flightIn.duration
+    );
     return {
       callsign: flightIn.callsign,
       pilot: {
@@ -120,25 +134,21 @@ export class FlightsService {
       },
       departure: {
         id: flightIn.departure.id,
+        icao: flightIn.departure.icao,
       },
       arrival: {
         id: flightIn.arrival.id,
+        icao: flightIn.arrival.icao,
       },
       aircraft: {
         id: flightIn.aircraft.id,
       },
-      departureTime: this.convertTimeToEpoch(flightIn.departureTime),
-      duration: this.convertDurationStringToNumber(flightIn.duration),
+      departureTime: dayjs(flightIn.departureTime).toDate(),
+      arrivalTime: dayjs(flightIn.departureTime)
+        .add(durationMinutes!, 'minutes')
+        .toDate(),
+      duration: durationMinutes,
     };
-  }
-
-  private convertTimeToEpoch(time: string) {
-    const date = new Date();
-    const year = date.getFullYear();
-    const month = date.getMonth() + 1;
-    const day = date.getDate();
-
-    return new Date(`${year}-${month}-${day} ${time}`);
   }
 
   private convertDurationStringToNumber(duration: string) {
@@ -166,9 +176,11 @@ export interface FlightInput {
   callsign: string;
   departure: {
     id: string;
+    icao: string;
   };
   arrival: {
     id: string;
+    icao: string;
   };
   aircraft: {
     id: string;

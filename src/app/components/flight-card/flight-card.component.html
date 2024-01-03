@@ -6,18 +6,48 @@
     </mat-card-title>
   </mat-card-header>
   <mat-divider></mat-divider>
-  <mat-card-content fxLayout fxLayoutAlign="center center">
-    @if (!nextFlight) {
-      @if (isNextFlight) {
-        <button
-          mat-raised-button
-          color="accent"
-          (click)="openBookFlightDialog()">
-          Book Flight
+  <mat-card-content>
+    @if (!flight) {
+      <div fxLayout fxLayout="center center">
+        @if (isNextFlight) {
+          <button
+            mat-raised-button
+            color="accent"
+            (click)="openBookFlightDialog()">
+            Book Flight
+          </button>
+        } @else {
+          <mat-icon>sentiment_dissatisfied</mat-icon>&nbsp; No flights found
+          yet!
+        }
+      </div>
+    } @else {
+      <div
+        fxLayout="row"
+        fxLayoutAlign="space-between center"
+        class="flight-data">
+        <div fxLayout="column" fxLayoutAlign="center center">
+          {{ flight.departure.icao }}
+          <span class="iata">{{ flight.departure.iata }}</span>
+          <span>{{ flightDistance }} nm</span>
+        </div>
+        <div fxLayout="column" fxLayoutAlign="center center">
+          {{ flight.aircraft.airframe.icao }}
+          <span class="callsign">{{ flight.callsign }}</span>
+          <span>&nbsp;</span>
+        </div>
+        <div fxLayout="column" fxLayoutAlign="center center">
+          {{ flight.arrival.icao }}
+          <span class="iata">{{ flight.arrival.iata }}</span>
+          <span>{{ flightTime }}</span>
+        </div>
+      </div>
+      <div fxLayout="row" fxLayoutAlign="space-between center" class="actions">
+        <button mat-raised-button disabled color="primary">View Flight</button>
+        <button mat-flat-button color="accent" (click)="cancelFlight()">
+          Cancel Flight
         </button>
-      } @else {
-        <mat-icon>sentiment_dissatisfied</mat-icon>&nbsp; No flights found yet!
-      }
+      </div>
     }
   </mat-card-content>
 </mat-card>

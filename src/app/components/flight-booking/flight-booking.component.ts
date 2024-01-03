@@ -29,6 +29,7 @@ import { Aircraft } from '../../clients/aircrafts.client';
 import { AircraftsService } from '../../services/aircrafts/aircrafts.service';
 import { FlightsService } from '../../services/flights/flights.service';
 import { DurationPickerDirective } from '../../directives/duration-picker/duration-picker.directive';
+import dayjs from 'dayjs';
 
 @Component({
   selector: 'app-flight-booking',
@@ -85,7 +86,28 @@ export class FlightBookingComponent implements OnInit {
     });
   }
 
+  private formatDate(date: Date) {
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    const hours = date.getHours();
+    const minutes = date.getMinutes();
+
+    const paddedMonth = String(month).padStart(2, '0');
+    const paddedDay = String(day).padStart(2, '0');
+    const paddedHours = String(hours).padStart(2, '0');
+    const paddedMinutes = String(minutes).padStart(2, '0');
+
+    const formatted = `${year}-${paddedMonth}-${paddedDay}T${paddedHours}:${paddedMinutes}`;
+    console.log(formatted);
+    return formatted;
+  }
+
   ngOnInit(): void {
+    this.detailsForm.controls['departureTime'].setValue(
+      this.formatDate(dayjs().add(15, 'minutes').toDate())
+    );
+
     this.detailsForm.controls['departure'].valueChanges
       .pipe(startWith(''))
       .subscribe(value => {

@@ -19,7 +19,6 @@ export class DurationPickerDirective implements OnChanges {
   constructor(public el: ElementRef) {
     this.picker = el.nativeElement;
     this.picker.value = '01:00';
-    this.picker.style.textAlign = 'center';
   }
 
   @HostListener('keydown', ['$event'])

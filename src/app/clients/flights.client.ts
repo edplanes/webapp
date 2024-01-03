@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Injectable } from '@angular/core';
 import { APIClient } from '../shared/APIClient';
 import { IUser } from '../models/auth.model';
@@ -14,9 +15,9 @@ export enum FlightStatus {
 export interface Flight {
   id: string;
   pilot: IUser;
-  callsing: string;
+  callsign: string;
   flightNumber: string;
-  aircraft: unknown;
+  aircraft: any;
   status: FlightStatus;
   departureTime: Date;
   arrivalTime: Date;
@@ -40,5 +41,9 @@ export class FlightsClient extends APIClient {
       `${this.apiServerBaseUrl}/users/${userId}/flights`,
       flight
     );
+  }
+
+  cancelFlight(flightId: string) {
+    return this.http.delete(`${this.apiServerBaseUrl}/flights/${flightId}`);
   }
 }
