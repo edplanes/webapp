@@ -1,11 +1,14 @@
 mat-card-content {
   margin-top: 1rem;
+  width: 100%;
+  height: 100%;
 }
 
 mat-card {
   margin: 2rem;
   border-radius: 1rem;
   min-width: 20rem;
+  height: 100%;
 }
 
 .iata {
@@ -19,9 +22,11 @@ mat-card {
 }
 
 .flight-data {
+  width: 100%;
   margin: 1rem;
 }
 
 .actions {
+  width: 100%;
   margin: 1rem;
 }

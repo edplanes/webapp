@@ -1,4 +1,4 @@
-<mat-toolbar color="primary">
+<mat-toolbar color="primary" class="drag">
   <mat-toolbar-row fxLayout fxLayoutAlign="space-between center">
     <button mat-button class="brand" [routerLink]="'/'">
       <span>EdPlanes</span>
@@ -12,8 +12,18 @@
       <mat-icon>access_time</mat-icon>&nbsp;
       {{ currentTime | date: 'HH:mm' }}&nbsp; local
     </div>
-    <mat-slide-toggle [formControl]="toogleControl" class="mr-8 theme-switch">
-    </mat-slide-toggle>
+    <nav>
+      <mat-slide-toggle [formControl]="toogleControl" class="mr-8 theme-switch">
+      </mat-slide-toggle>
+      @if (isElectron) {
+        <button mat-button (click)="onMinimizeClick()">
+          <mat-icon>minimize</mat-icon>
+        </button>
+        <button mat-button (click)="onCloseClick()">
+          <mat-icon>close</mat-icon>
+        </button>
+      }
+    </nav>
   </mat-toolbar-row>
   @if (!isHeadless) {
     <mat-toolbar-row fxLayout fxLayoutAlign="space-between center">

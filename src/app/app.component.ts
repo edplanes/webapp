@@ -19,6 +19,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatMenuModule } from '@angular/material/menu';
 import { AuthService } from './services/auth/auth.service';
 import { MatDividerModule } from '@angular/material/divider';
+import { ElectronService } from './services/electron/electron.service';
 
 interface NavigationOption {
   path: string;
@@ -54,7 +55,7 @@ export class AppComponent implements OnInit {
   );
   subscription: Subscription = new Subscription();
   displayedPaths: NavigationOption[] = [];
-  toogleControl = new FormControl(this.prefersDarkMode());
+  toogleControl = new FormControl(this.prefersDarkMode() || this.isElectron);
 
   get isDispatcher() {
     const roles = this.authService.authenticatedUser?.roles;
@@ -70,10 +71,15 @@ export class AppComponent implements OnInit {
     return this.authService.authenticatedUser;
   }
 
+  get isElectron() {
+    return this.electron.isElectron;
+  }
+
   constructor(
     private router: Router,
     private authService: AuthService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private electron: ElectronService
   ) {
     this.authService.isLoggedIn().subscribe(value => {
       this.displayedPaths = this.getMenuPaths(value);
@@ -87,7 +93,7 @@ export class AppComponent implements OnInit {
       body.classList.toggle('darkMode', darkMode!);
     });
 
-    this.subscription = timer(0, 1000)
+    timer(0, 1000)
       .pipe(map(() => new Date()))
       .subscribe(time => {
         this.currentTime = time;
@@ -109,6 +115,14 @@ export class AppComponent implements OnInit {
   logout() {
     this.authService.logout();
     this.router.navigateByUrl('/');
+  }
+
+  onCloseClick() {
+    this.electron.closeApp();
+  }
+
+  onMinimizeClick() {
+    this.electron.minimizeWindow();
   }
 
   private prefersDarkMode() {

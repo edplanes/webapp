@@ -1,0 +1,13 @@
+.drag {
+  -webkit-user-select: none;
+  -webkit-app-region: drag;
+}
+
+.drag button,
+.drag mat-slide-toggle {
+  -webkit-app-region: no-drag;
+}
+
+.toolbar-electron > section {
+  margin: 0 0.5rem 0 0.5rem;
+}

@@ -6,21 +6,18 @@
     </mat-card-title>
   </mat-card-header>
   <mat-divider></mat-divider>
-  <mat-card-content>
+  <mat-card-content fxLayout="column" fxLayoutAlign="center center">
     @if (!flight) {
-      <div fxLayout fxLayout="center center">
-        @if (isNextFlight) {
-          <button
-            mat-raised-button
-            color="accent"
-            (click)="openBookFlightDialog()">
-            Book Flight
-          </button>
-        } @else {
-          <mat-icon>sentiment_dissatisfied</mat-icon>&nbsp; No flights found
-          yet!
-        }
-      </div>
+      @if (isNextFlight) {
+        <button
+          mat-raised-button
+          color="accent"
+          (click)="openBookFlightDialog()">
+          Book Flight
+        </button>
+      } @else {
+        <mat-icon>sentiment_dissatisfied</mat-icon>&nbsp; No flights found yet!
+      }
     } @else {
       <div
         fxLayout="row"
@@ -29,22 +26,33 @@
         <div fxLayout="column" fxLayoutAlign="center center">
           {{ flight.departure.icao }}
           <span class="iata">{{ flight.departure.iata }}</span>
-          <span>{{ flightDistance }} nm</span>
+          <span>{{ flight.departureTime | date: 'dd.MM.YYY HH:mm' }} </span>
         </div>
         <div fxLayout="column" fxLayoutAlign="center center">
           {{ flight.aircraft.airframe.icao }}
-          <span class="callsign">{{ flight.callsign }}</span>
-          <span>&nbsp;</span>
+          <span>{{ flight.callsign }}</span>
+          <span>{{ flightTime }}</span>
+          <span>{{ flightDistance }} nm</span>
         </div>
         <div fxLayout="column" fxLayoutAlign="center center">
           {{ flight.arrival.icao }}
           <span class="iata">{{ flight.arrival.iata }}</span>
-          <span>{{ flightTime }}</span>
+          <span>{{ flight.arrivalTime | date: 'dd.MM.YYYY HH:mm' }}</span>
         </div>
       </div>
       <div fxLayout="row" fxLayoutAlign="space-between center" class="actions">
-        <button mat-raised-button disabled color="primary">View Flight</button>
-        <button mat-flat-button color="accent" (click)="cancelFlight()">
+        <div
+          matTooltip="Please use acars app!"
+          [matTooltipDisabled]="isElectron">
+          <button
+            mat-raised-button
+            [disabled]="!isElectron"
+            color="primary"
+            (click)="startFlight()">
+            Start Flight
+          </button>
+        </div>
+        <button mat-stroked-button color="accent" (click)="cancelFlight()">
           Cancel Flight
         </button>
       </div>

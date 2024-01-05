@@ -1,4 +1,5 @@
 @use '@angular/material' as mat;
+@use './app/app.component.theme.scss' as app;
 
 @include mat.core();
 
@@ -26,7 +27,9 @@ $theme: mat.define-light-theme(
 );
 
 @include mat.all-component-themes($theme);
+@include app.theme($theme);
 
 .darkMode {
   @include mat.all-component-colors($dark-theme);
+  @include app.theme($dark-theme);
 }

@@ -13,6 +13,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { FlightBookingComponent } from '../flight-booking/flight-booking.component';
 import { DatePipe } from '@angular/common';
 import { MessageDialogComponent } from '../message-dialog/message-dialog.component';
+import { ElectronService } from '../../services/electron/electron.service';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
   selector: 'app-flight-card',
@@ -24,6 +26,7 @@ import { MessageDialogComponent } from '../message-dialog/message-dialog.compone
     MatButtonModule,
     FlexLayoutModule,
     DatePipe,
+    MatTooltipModule,
   ],
   templateUrl: './flight-card.component.html',
   styleUrl: './flight-card.component.scss',
@@ -31,12 +34,15 @@ import { MessageDialogComponent } from '../message-dialog/message-dialog.compone
 export class FlightCardComponent implements OnInit {
   @Input() isNextFlight: boolean = false;
   flight: Flight | undefined = undefined;
+  flightDistance: number = 0;
 
   constructor(
     private flightService: FlightsService,
     private logger: LogService,
     private bookFlightDialog: MatDialog,
-    private cancelConfirmDialog: MatDialog
+    private startConfirmDialog: MatDialog,
+    private cancelConfirmDialog: MatDialog,
+    private electron: ElectronService
   ) {}
 
   get flightTime() {
@@ -49,13 +55,8 @@ export class FlightCardComponent implements OnInit {
     ).padStart(2, '0')}`;
   }
 
-  get flightDistance() {
-    return Math.floor(
-      this.flightService.calculateAirportsDistance(
-        this.flight!.departure,
-        this.flight!.arrival
-      )
-    );
+  get isElectron() {
+    return this.electron.isElectron;
   }
 
   ngOnInit(): void {
@@ -66,6 +67,15 @@ export class FlightCardComponent implements OnInit {
   openBookFlightDialog() {
     const dialogRef = this.bookFlightDialog.open(FlightBookingComponent);
     dialogRef.afterClosed().subscribe(() => this.fetchFlight());
+  }
+
+  startFlight() {
+    this.startConfirmDialog.open(MessageDialogComponent, {
+      autoFocus: true,
+      data: {
+        message: `This will immediately initialize a connection with flight simulator. Continue?`,
+      },
+    });
   }
 
   cancelFlight() {
@@ -94,6 +104,12 @@ export class FlightCardComponent implements OnInit {
       next: flight => {
         this.logger.debug('Fetched flight', flight);
         this.flight = flight;
+        this.flightDistance = Math.floor(
+          this.flightService.calculateAirportsDistance(
+            this.flight!.departure,
+            this.flight!.arrival
+          )
+        );
       },
       error: error => {
         if (error instanceof FlightNotFoundError) {
