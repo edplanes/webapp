@@ -1,10 +1,7 @@
-import { BrowserWindow, ipcMain } from 'electron';
+import { ipcMain } from 'electron';
+import { getWindow } from './util/window';
 
 export const registerIpcMain = (app: Electron.App) => {
-  const getWindow = () => {
-    return BrowserWindow.getAllWindows().find((w) => !w.isDestroyed());
-  };
-
   ipcMain.handle('close', () => {
     app.quit();
   });

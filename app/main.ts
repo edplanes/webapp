@@ -2,10 +2,13 @@ import { app, BrowserWindow } from 'electron';
 import * as path from 'path';
 import * as fs from 'fs';
 import { registerIpcMain } from './ipc';
+import { registerSimConnect } from './simconnect';
 
 let win: BrowserWindow | null = null;
 const args = process.argv.slice(1),
-  serve = args.some(val => val === '--serve');
+  serve = args.some(val => val === '--serve'),
+  record = args.some(val => val === '--record'),
+  playback = args.some(val => val === '---playback');
 
 function createWindow(): BrowserWindow {
   const size = {
@@ -79,6 +82,7 @@ try {
   });
 
   registerIpcMain(app);
+  registerSimConnect(record, playback);
 } catch (e) {
   // Catch Error
   // throw e;
