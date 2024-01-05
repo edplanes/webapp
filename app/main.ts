@@ -82,7 +82,7 @@ try {
   });
 
   registerIpcMain(app);
-  registerSimConnect(record, playback);
+  registerSimConnect(app, record, playback);
 } catch (e) {
   // Catch Error
   // throw e;
