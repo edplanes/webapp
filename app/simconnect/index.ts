@@ -43,14 +43,18 @@ let lastAircraftState: AircraftData | undefined;
 let lastFlapsState: FlapsData | undefined;
 let lastLightsState: LightsData | undefined;
 
-export const registerSimConnect = (record: boolean, playback: boolean) => {
-  if (playback && record) registerRecord();
+export const registerSimConnect = (
+  app: Electron.App,
+  record: boolean,
+  playback: boolean
+) => {
+  if (playback && record) registerRecord(app);
   else if (playback) registerPlayback();
-  else if (record) registerRecord();
+  else if (record) registerRecord(app);
   else registerNormalOperation();
 };
 
-function registerRecord() {
+function registerRecord(app: Electron.App) {
   const file = fs.openSync('record.json', 'a');
   const data: RequestData<unknown>[] = [];
   open('edplanes-acars-record', Protocol.KittyHawk).then(({ handle }) => {
@@ -63,7 +67,7 @@ function registerRecord() {
     registerLightsDataRequest(handle, data.push);
     registerFlapsDataRequest(handle, data.push);
 
-    handle.on('quit', () => {
+    app.on('quit', () => {
       fs.writeFileSync(file, JSON.stringify(data));
     });
   });
