@@ -1,1 +1,15 @@
 <p>Home Page</p>
+<button (click)="startFlight()">Start</button>
+<mat-accordion>
+  @for (item of receivedEvents; track $index) {
+    <mat-expansion-panel>
+      <mat-expansion-panel-header>
+        <mat-panel-title> {{ item.type }} </mat-panel-title>
+        <mat-panel-description>
+          {{ item.createdAt }}
+        </mat-panel-description>
+      </mat-expansion-panel-header>
+      <pre>{{ item.payload }}</pre>
+    </mat-expansion-panel>
+  }
+</mat-accordion>

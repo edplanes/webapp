@@ -1,6 +1,5 @@
 import { app, BrowserWindow } from 'electron';
 import * as path from 'path';
-import * as fs from 'fs';
 import { registerIpcMain } from './ipc';
 import { registerSimConnect } from './simconnect';
 
@@ -35,15 +34,10 @@ function createWindow(): BrowserWindow {
     win.loadURL('http://localhost:4200');
   } else {
     // Path when running electron executable
-    let pathIndex = './index.html';
+    const pathIndex = '../dist/webapp/browser/index.html';
 
-    if (fs.existsSync(path.join(__dirname, '../dist/index.html'))) {
-      // Path when running electron in local folder
-      pathIndex = '../dist/index.html';
-    }
-
-    const url = new URL(path.join('file:', __dirname, pathIndex));
-    win.loadURL(url.href);
+    const url = path.join(__dirname, pathIndex);
+    win.loadFile(url);
   }
 
   // Emitted when the window is closed.
