@@ -34,6 +34,7 @@ import { ipcMain } from 'electron';
 
 let frame = 0;
 type handlerFn<T> = (data: RequestData<T>) => void;
+let lastPostitionState: PositionRequestPayload | undefined;
 let lastGearState: GearData | undefined;
 //let lastAircraftState: AircraftData | undefined;
 let lastFlapsState: FlapsData | undefined;
@@ -116,6 +117,10 @@ function registerPositionDataRequest(
         ...readPositionData(recvSimObjectData),
       },
     };
+
+    if (lastPostitionState && deepEqual(lastPostitionState, dataObj.payload)) {
+      return;
+    }
 
     handler(dataObj);
     frame++;
