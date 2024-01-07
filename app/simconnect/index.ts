@@ -9,8 +9,9 @@ import {
 import * as fs from 'fs';
 import deepEqual from 'deep-equal';
 import { ipcMain } from 'electron';
-import { client as WebSocket, connection } from 'websocket';
 import {
+  AircraftData,
+  AircraftRequestPayload,
   FlapsData,
   FlapsRequestPayload,
   GearData,
@@ -35,6 +36,11 @@ import { addFlapsDataToRequest, readFlapsRequest } from './flapsRequest';
 import { addLightsDataToRequest, readLightsRequest } from './lightsRequest';
 import { getWindow } from '../util/window';
 import { addPowerDataToRequest, readPowerRequest } from './powerRequest';
+import {
+  addAircraftDataToRequest,
+  readAircraftRequest,
+} from './aircraftRequest';
+import EventEmitter from 'events';
 
 export type Options = {
   record: boolean;
@@ -49,145 +55,73 @@ let lastGearState: GearData | undefined;
 let lastPowerState: PowerData | undefined;
 let lastFlapsState: FlapsData | undefined;
 let lastLightsState: LightsData | undefined;
+let lastAircraftState: AircraftData | undefined;
 
-export const registerSimConnect = (app: Electron.App, o: Options) => {
-  if (o.playback && o.record) registerNormalOperation(app, o);
-  else if (o.playback) registerPlayback(app, o);
-  else registerNormalOperation(app, o);
+export const registerSimConnect = (
+  app: Electron.App,
+  eventer: EventEmitter,
+  playback: boolean
+) => {
+  if (playback) registerPlayback(app, eventer);
+  else registerNormalOperation(app, eventer);
 };
 
-function registerNormalOperation(app: Electron.App, o: Options) {
-  ipcMain.handle('sim:connect', (_, fligthId: string) => {
-    const data: RequestData<unknown>[] | undefined = o.record ? [] : undefined;
-    const client = o.local ? undefined : new WebSocket();
-    let ws: connection | undefined;
-    client?.connect(`ws://localhost:3000?flightId=${fligthId}`);
-    client?.on('connect', function open(conn) {
-      console.log('connected');
-      ws = conn;
-    });
-    const record = o.record;
+function registerNormalOperation(app: Electron.App, eventer: EventEmitter) {
+  ipcMain.handle('sim:connect', (_, fligthId: string, token: string) => {
     open('edplanes-acars', Protocol.KittyHawk).then(({ recvOpen, handle }) => {
       const window = getWindow();
       window?.webContents.send('sim:connected', recvOpen);
-      ws?.on('error', (err: Error) => window?.webContents.send('error', err));
+      eventer.emit('flight:started', fligthId, token);
 
-      registerPositionDataRequest(handle, dataReceived => {
-        window?.webContents.send('sim:positionRequestReceived', dataReceived);
-        data?.push(dataReceived);
-        ws?.send(JSON.stringify(dataReceived));
-      });
+      const handler = (dataReceived: RequestData<unknown>) => {
+        window?.webContents.send('sim:dataReceived', dataReceived);
+        eventer.emit('sim:dataReceived', dataReceived);
+      };
 
-      registerGearDataRequest(handle, dataReceived => {
-        window?.webContents.send('sim:gearRequestReceived', dataReceived);
-        data?.push(dataReceived);
-        ws?.send(JSON.stringify(dataReceived));
-      });
-      registerLightsDataRequest(handle, dataReceived => {
-        window?.webContents.send('sim:lightsRequestReceived', dataReceived);
-        data?.push(dataReceived);
-        ws?.send(JSON.stringify(dataReceived));
-      });
-      registerFlapsDataRequest(handle, dataReceived => {
-        window?.webContents.send('sim:flapsRequestReceived', dataReceived);
-        data?.push(dataReceived);
-        ws?.send(JSON.stringify(dataReceived));
-      });
-      registerPowerDataRequest(handle, dataReceived => {
-        window?.webContents.send('sim:powerRequestReceived', dataReceived);
-        data?.push(dataReceived);
-        ws?.send(JSON.stringify(dataReceived));
-      });
+      registerPositionDataRequest(handle, handler);
+      registerGearDataRequest(handle, handler);
+      registerLightsDataRequest(handle, handler);
+      registerFlapsDataRequest(handle, handler);
+      registerPowerDataRequest(handle, handler);
+      registerAircraftDataRequest(handle, handler);
 
-      if (record) {
-        app.on('quit', () => {
-          const file = fs.openSync('record.json', 'a');
-          fs.writeFileSync(file, JSON.stringify(data));
-        });
-      }
+      ipcMain.handle('flight:close', () => {
+        handle.close();
+        eventer.emit('flight:closed');
+      });
     });
   });
 }
 
-function registerPlayback(app: Electron.App, o: Options) {
-  ipcMain.handle('sim:connect', (_, fligthId: string) => {
-    const timeouts: NodeJS.Timeout[] = [];
-    const window = getWindow();
+function registerPlayback(app: Electron.App, eventer: EventEmitter) {
+  const timeouts: NodeJS.Timeout[] = [];
+  const window = getWindow();
+  ipcMain.handle('flight:close', () => {
+    timeouts.forEach(timeout => {
+      clearTimeout(timeout);
+    });
+    window?.webContents.send('flight:closed');
+    eventer.emit('flight:closed');
+  });
+  ipcMain.handle('sim:connect', (_, fligthId: string, token: string) => {
     const data: RequestData<unknown>[] = JSON.parse(
       fs.readFileSync('record.json', 'utf8')
     );
-    const client = o.local ? undefined : new WebSocket();
-    let ws: connection | undefined;
-    client?.connect(`ws://localhost:3000?flightId=${fligthId}`);
-
-    client?.on('connect', function open(conn) {
-      console.log('connected');
-      ws = conn;
-    });
-
-    ws?.on('error', console.error);
+    eventer.emit('flight:started', fligthId, token);
+    window?.webContents.send('sim:connected');
 
     const initialTimestamp = new Date(data[0].createdAt).getTime();
 
     data.forEach(item => {
-      switch (item.type) {
-        case 'postion':
-        case 'position':
-          timeouts.push(
-            setTimeout(
-              () => {
-                ws?.send(JSON.stringify(item));
-                window?.webContents.send('sim:positionRequestReceived', item);
-              },
-              new Date(item.createdAt).getTime() - initialTimestamp
-            )
-          );
-          break;
-        case 'gear':
-          timeouts.push(
-            setTimeout(
-              () => {
-                ws?.send(JSON.stringify(item));
-                window?.webContents.send('sim:gearRequestReceived', item);
-              },
-              new Date(item.createdAt).getTime() - initialTimestamp
-            )
-          );
-          break;
-        case 'flaps':
-          timeouts.push(
-            setTimeout(
-              () => {
-                ws?.send(JSON.stringify(item));
-                window?.webContents.send('sim:flapsRequestReceived', item);
-              },
-              new Date(item.createdAt).getTime() - initialTimestamp
-            )
-          );
-          break;
-        case 'lights':
-          timeouts.push(
-            setTimeout(
-              () => {
-                ws?.send(JSON.stringify(item));
-                window?.webContents.send('sim:lightsRequestReceived', item);
-              },
-              new Date(item.createdAt).getTime() - initialTimestamp
-            )
-          );
-          break;
-        case 'power':
-          timeouts.push(
-            setTimeout(
-              () => {
-                ws?.send(JSON.stringify(item));
-                window?.webContents.send('sim:powerRequestReceived', item);
-              },
-              new Date(item.createdAt).getTime() - initialTimestamp
-            )
-          );
-          break;
-      }
+      timeouts.push(
+        setTimeout(
+          () => {
+            eventer.emit('sim:dataReceived', item);
+            window?.webContents.send('sim:dataReceived', item);
+          },
+          new Date(item.createdAt).getTime() - initialTimestamp
+        )
+      );
     });
 
     app.on('quit', () => timeouts.forEach(item => clearTimeout(item)));
@@ -388,6 +322,49 @@ function registerLightsDataRequest(
     }
 
     lastLightsState = dataObj.payload.lights;
+    handler(dataObj);
+  });
+}
+
+function registerAircraftDataRequest(
+  handle: SimConnectConnection,
+  handler: handlerFn<AircraftRequestPayload>
+) {
+  const REQUEST_ID = 5;
+  const DEFINITION_ID = 5;
+
+  addPositionDataToDefinition(DEFINITION_ID, handle);
+  addAircraftDataToRequest(DEFINITION_ID, handle);
+
+  handle.requestDataOnSimObject(
+    REQUEST_ID,
+    DEFINITION_ID,
+    SimConnectConstants.OBJECT_ID_USER,
+    SimConnectPeriod.SIM_FRAME
+  );
+
+  handle.on('simObjectData', recvSimObjectData => {
+    if (recvSimObjectData.requestID !== REQUEST_ID) return;
+
+    const dataObj: RequestData<AircraftRequestPayload> = {
+      type: 'aircraft',
+      createdAt: new Date(),
+      payload: {
+        timestamp: Date.now(),
+        frame,
+        ...readPositionData(recvSimObjectData),
+        aircraft: readAircraftRequest(recvSimObjectData),
+      },
+    };
+
+    if (
+      lastAircraftState &&
+      deepEqual(lastAircraftState, dataObj.payload.aircraft)
+    ) {
+      return;
+    }
+
+    lastAircraftState = dataObj.payload.aircraft;
     handler(dataObj);
   });
 }

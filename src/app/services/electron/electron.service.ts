@@ -1,7 +1,16 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { ipcRenderer, webFrame } from 'electron';
 import * as childProcess from 'child_process';
 import * as fs from 'fs';
+import { ActivatedRouteSnapshot, CanActivateFn, Router } from '@angular/router';
+
+export const electronGuard: CanActivateFn = (route: ActivatedRouteSnapshot) => {
+  const electronService = inject(ElectronService);
+  if (electronService.isElectron && route.params['id']) return true;
+
+  inject(Router).navigateByUrl('/');
+  return false;
+};
 
 @Injectable({
   providedIn: 'root',

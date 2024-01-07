@@ -15,6 +15,7 @@ import { DatePipe } from '@angular/common';
 import { MessageDialogComponent } from '../message-dialog/message-dialog.component';
 import { ElectronService } from '../../services/electron/electron.service';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-flight-card',
@@ -42,7 +43,8 @@ export class FlightCardComponent implements OnInit {
     private bookFlightDialog: MatDialog,
     private startConfirmDialog: MatDialog,
     private cancelConfirmDialog: MatDialog,
-    private electron: ElectronService
+    private electron: ElectronService,
+    private router: Router
   ) {}
 
   get flightTime() {
@@ -70,12 +72,18 @@ export class FlightCardComponent implements OnInit {
   }
 
   startFlight() {
-    this.startConfirmDialog.open(MessageDialogComponent, {
+    const dialogRef = this.startConfirmDialog.open(MessageDialogComponent, {
       autoFocus: true,
       data: {
-        message: `This will immediately initialize a connection with flight simulator. Continue?`,
+        message: `This will immediately initialize a connection with flight simulator and reporting service. Continue?`,
       },
     });
+    dialogRef
+      .afterClosed()
+      .subscribe(
+        result =>
+          result && this.router.navigateByUrl(`logger/${this.flight?.id}`)
+      );
   }
 
   cancelFlight() {

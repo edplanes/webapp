@@ -21,8 +21,8 @@ export const addAircraftDataToRequest = (
   handle.addToDataDefinition(
     defID,
     'TITLE',
-    'string',
-    SimConnectDataType.STRINGV
+    'number', // MSFS is weird, I don't know why but it's working as expected
+    SimConnectDataType.STRING256
   );
   handle.addToDataDefinition(
     defID,
@@ -37,7 +37,7 @@ export const readAircraftRequest = (
 ): AircraftData => {
   const data = simObjectData.data;
   return {
-    configTitle: data.readStringV(),
+    configTitle: data.readString256(),
     filename: aircraftConfig,
     engines: data.readInt32(),
   };

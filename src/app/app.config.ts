@@ -11,6 +11,7 @@ import {
 import { AuthInterceptor } from './services/auth/auth.interceptor';
 import { ConfigService } from './services/config/config.service';
 import { AuthState } from './services/auth/authState';
+import { LoggerState } from './services/logger/logger.state';
 
 export function initializeApp() {
   const configService = inject(ConfigService);
@@ -32,6 +33,10 @@ export const appConfig: ApplicationConfig = {
     {
       provide: AuthState,
       useValue: AuthState.getInstance(),
+    },
+    {
+      provide: LoggerState,
+      useValue: LoggerState.getInstance(),
     },
   ],
 };

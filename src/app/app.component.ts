@@ -131,20 +131,7 @@ export class AppComponent implements OnInit {
 
   private getMenuPaths(isAuthenticated: boolean): NavigationOption[] {
     if (!isAuthenticated) {
-      return [
-        {
-          path: '/home',
-          displayName: 'Home',
-        },
-        {
-          path: '/login',
-          displayName: 'Login',
-        },
-        {
-          path: '/register',
-          displayName: 'Register',
-        },
-      ];
+      return [];
     }
 
     return [

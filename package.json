@@ -8,13 +8,14 @@
     "start": "ng serve",
     "build": "ng build",
     "build:electron": "tsc -p tsconfig.electron.json && ng build --base-href ./",
+    "build:recorder": "tsc --skipLibCheck --esModuleInterop --outDir dist/recorder ./scripts/recorder.ts",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "e2e": "ng e2e",
     "cypress:open": "cypress open",
     "cypress:run": "cypress run",
     "lint": "ng lint",
-    "electron:dev": "concurrently -k \"ng serve\" \"wait-on http://localhost:4200 && npm run build:electron && electron . --serve\""
+    "electron:dev": "concurrently -k \"ng serve\" \"wait-on http://localhost:4200 && tsc -p tsconfig.electron.json && electron . --serve\""
   },
   "private": true,
   "dependencies": {

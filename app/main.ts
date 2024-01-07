@@ -2,6 +2,11 @@ import { app, BrowserWindow } from 'electron';
 import * as path from 'path';
 import { registerIpcMain } from './ipc';
 import { registerSimConnect } from './simconnect';
+import EventEmitter from 'events';
+import { RequestData } from './simconnect/types';
+import { writeFileSync } from 'fs';
+import WebSocket, { connection } from 'websocket';
+import { log } from './util/log';
 
 let win: BrowserWindow | null = null;
 const args = process.argv.slice(1),
@@ -51,7 +56,9 @@ try {
   // initialization and is ready to create browser windows.
   // Some APIs can only be used after this event occurs.
   // Added 400 ms to fix the black background issue while using transparent window. More detais at https://github.com/electron/electron/issues/15947
-  app.on('ready', () => setTimeout(createWindow, 400));
+  app.on('ready', () => {
+    setTimeout(createWindow, 400);
+  });
 
   // Quit when all windows are closed.
   app.on('window-all-closed', () => {
@@ -70,8 +77,44 @@ try {
     }
   });
 
+  const eventer = new EventEmitter();
+  if (record) {
+    const dataPoints: RequestData<unknown>[] = [];
+    eventer.on('sim:dataReceived', data => {
+      dataPoints.push(data);
+    });
+
+    process.on('exit', () => {
+      writeFileSync('record.json', JSON.stringify(dataPoints));
+    });
+  }
+
+  if (!local) {
+    let ws: connection | undefined;
+    eventer.on('flight:started', (flightId: string, token: string) => {
+      log('Connecting...', flightId);
+      const client = new WebSocket.client();
+      client.connect(`ws://localhost:3000?flightId=${flightId}`);
+      client.on('connect', (conn: connection) => {
+        log('connected');
+        ws = conn;
+      });
+      client.on('connectFailed', err => log('WS Err', err));
+      client.on('httpResponse', log);
+    });
+
+    eventer.on('sim:dataReceived', data => {
+      ws?.send(JSON.stringify(data));
+    });
+
+    eventer.on('flight:close', () => {
+      log('CLosing flight...');
+      ws?.close();
+    });
+  }
+
   registerIpcMain(app);
-  registerSimConnect(app, { record, playback, local });
+  registerSimConnect(app, eventer, playback);
 } catch (e) {
   // Catch Error
   // throw e;

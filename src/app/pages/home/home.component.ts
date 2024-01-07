@@ -22,21 +22,16 @@ export class HomeComponent implements OnInit {
     this.electron.ipcRenderer.on('sim:connected', (_, data) => {
       this.connected = data;
     });
-    this.electron.ipcRenderer.on('sim:positionRequestReceived', (_, data) => {
-      this.receivedEvents = data;
-    });
-    this.electron.ipcRenderer.on('sim:gearRequestReceived', (_, data) => {
-      this.receivedEvents = data;
-    });
-    this.electron.ipcRenderer.on('sim:lightsRequestReceived', (_, data) => {
-      this.receivedEvents = data;
-    });
-    this.electron.ipcRenderer.on('sim:flapsRequestReceived', (_, data) => {
+    this.electron.ipcRenderer.on('flight:closed', () => (this.connected = ''));
+    this.electron.ipcRenderer.on('sim:dataReceived', (_, data) => {
       this.receivedEvents = data;
     });
   }
 
   startFlight() {
-    this.electron.ipcRenderer.invoke('sim:connect', 'test');
+    console.log(!this.connected);
+    if (!this.connected)
+      this.electron.ipcRenderer.invoke('sim:connect', 'test');
+    else this.electron.ipcRenderer.invoke('flight:close');
   }
 }
