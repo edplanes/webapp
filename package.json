@@ -1,21 +1,20 @@
 {
   "name": "webapp",
   "version": "0.0.0",
-  "main": "app/main.js",
+  "main": "dist/app/main.js",
   "description": "",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
-    "build:electron": "electron-builder",
+    "build:electron": "tsc -p tsconfig.electron.json && ng build --base-href ./",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "e2e": "ng e2e",
     "cypress:open": "cypress open",
     "cypress:run": "cypress run",
     "lint": "ng lint",
-    "preelectron:dev": "tsc --skipLibCheck --esModuleInterop app/main.ts",
-    "electron:dev": "concurrently -k \"ng serve\" \"wait-on http://localhost:4200 && electron . --serve\""
+    "electron:dev": "concurrently -k \"ng serve\" \"wait-on http://localhost:4200 && npm run build:electron && electron . --serve\""
   },
   "private": true,
   "dependencies": {
@@ -39,11 +38,12 @@
     "ngx-material-timepicker": "^13.1.1",
     "node-simconnect": "^3.6.1",
     "rxjs": "~7.8.0",
+    "socket.io-client": "~2.0.0",
     "tslib": "^2.3.0",
+    "websocket": "^1.0.34",
     "zone.js": "~0.14.2"
   },
   "devDependencies": {
-    "electron": "^28.1.1",
     "@angular-devkit/build-angular": "^17.0.7",
     "@angular-eslint/builder": "17.1.1",
     "@angular-eslint/eslint-plugin": "17.1.1",
@@ -56,10 +56,13 @@
     "@types/deep-equal": "^1.0.4",
     "@types/jasmine": "~5.1.0",
     "@types/node": "^20.10.6",
+    "@types/socket.io-client": "^3.0.0",
+    "@types/websocket": "^1.0.10",
     "@typescript-eslint/eslint-plugin": "6.17.0",
     "@typescript-eslint/parser": "6.17.0",
     "concurrently": "^8.2.2",
     "cypress": "latest",
+    "electron": "^28.1.1",
     "electron-builder": "^24.9.1",
     "eslint": "^8.54.0",
     "eslint-config-prettier": "^9.1.0",

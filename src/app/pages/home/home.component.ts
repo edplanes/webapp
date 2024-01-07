@@ -37,6 +37,6 @@ export class HomeComponent implements OnInit {
   }
 
   startFlight() {
-    this.electron.ipcRenderer.invoke('sim:connect');
+    this.electron.ipcRenderer.invoke('sim:connect', 'test');
   }
 }

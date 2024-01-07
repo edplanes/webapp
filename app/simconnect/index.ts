@@ -8,6 +8,8 @@ import {
 } from 'node-simconnect';
 import * as fs from 'fs';
 import deepEqual from 'deep-equal';
+import { ipcMain } from 'electron';
+import { client as WebSocket, connection } from 'websocket';
 import {
   FlapsData,
   FlapsRequestPayload,
@@ -16,6 +18,8 @@ import {
   LightsData,
   LightsRequestPayload,
   PositionRequestPayload,
+  PowerData,
+  PowerRequestPayload,
   RequestData,
 } from './types';
 import {
@@ -30,64 +34,165 @@ import { addGearDataToRequest, readGearRequest } from './gearRequest';
 import { addFlapsDataToRequest, readFlapsRequest } from './flapsRequest';
 import { addLightsDataToRequest, readLightsRequest } from './lightsRequest';
 import { getWindow } from '../util/window';
-import { ipcMain } from 'electron';
+import { addPowerDataToRequest, readPowerRequest } from './powerRequest';
+
+export type Options = {
+  record: boolean;
+  playback: boolean;
+  local: boolean;
+};
 
 let frame = 0;
 type handlerFn<T> = (data: RequestData<T>) => void;
 let lastPostitionState: PositionRequestPayload | undefined;
 let lastGearState: GearData | undefined;
-//let lastAircraftState: AircraftData | undefined;
+let lastPowerState: PowerData | undefined;
 let lastFlapsState: FlapsData | undefined;
 let lastLightsState: LightsData | undefined;
 
-export const registerSimConnect = (
-  app: Electron.App,
-  record: boolean,
-  playback: boolean
-) => {
-  if (playback && record) registerNormalOperation(app, true);
-  else if (playback) registerPlayback();
-  else registerNormalOperation(app, record);
+export const registerSimConnect = (app: Electron.App, o: Options) => {
+  if (o.playback && o.record) registerNormalOperation(app, o);
+  else if (o.playback) registerPlayback(app, o);
+  else registerNormalOperation(app, o);
 };
 
-function registerNormalOperation(app: Electron.App, record: boolean) {
-  const data: RequestData<unknown>[] = [];
-  ipcMain.handle('sim:connect', () => {
-    const file = fs.openSync('record.json', 'a');
-    open('edplanes-acars-record', Protocol.KittyHawk).then(
-      ({ recvOpen, handle }) => {
-        const window = getWindow();
-        window?.webContents.send('sim:connected', recvOpen);
+function registerNormalOperation(app: Electron.App, o: Options) {
+  ipcMain.handle('sim:connect', (_, fligthId: string) => {
+    const data: RequestData<unknown>[] | undefined = o.record ? [] : undefined;
+    const client = o.local ? undefined : new WebSocket();
+    let ws: connection | undefined;
+    client?.connect(`ws://localhost:3000?flightId=${fligthId}`);
+    client?.on('connect', function open(conn) {
+      console.log('connected');
+      ws = conn;
+    });
+    const record = o.record;
+    open('edplanes-acars', Protocol.KittyHawk).then(({ recvOpen, handle }) => {
+      const window = getWindow();
+      window?.webContents.send('sim:connected', recvOpen);
+      ws?.on('error', (err: Error) => window?.webContents.send('error', err));
 
-        registerPositionDataRequest(handle, dataReceived => {
-          window?.webContents.send('sim:positionRequestReceived', dataReceived);
-          record && data.push(dataReceived);
-        });
+      registerPositionDataRequest(handle, dataReceived => {
+        window?.webContents.send('sim:positionRequestReceived', dataReceived);
+        data?.push(dataReceived);
+        ws?.send(JSON.stringify(dataReceived));
+      });
 
-        registerGearDataRequest(handle, dataReceived => {
-          window?.webContents.send('sim:gearRequestReceived', dataReceived);
-          record && data.push(dataReceived);
-        });
-        registerLightsDataRequest(handle, dataReceived => {
-          window?.webContents.send('sim:lightsRequestReceived', dataReceived);
-          record && data.push(dataReceived);
-        });
-        registerFlapsDataRequest(handle, dataReceived => {
-          window?.webContents.send('sim:flapsRequestReceived', dataReceived);
-          record && data.push(dataReceived);
-        });
+      registerGearDataRequest(handle, dataReceived => {
+        window?.webContents.send('sim:gearRequestReceived', dataReceived);
+        data?.push(dataReceived);
+        ws?.send(JSON.stringify(dataReceived));
+      });
+      registerLightsDataRequest(handle, dataReceived => {
+        window?.webContents.send('sim:lightsRequestReceived', dataReceived);
+        data?.push(dataReceived);
+        ws?.send(JSON.stringify(dataReceived));
+      });
+      registerFlapsDataRequest(handle, dataReceived => {
+        window?.webContents.send('sim:flapsRequestReceived', dataReceived);
+        data?.push(dataReceived);
+        ws?.send(JSON.stringify(dataReceived));
+      });
+      registerPowerDataRequest(handle, dataReceived => {
+        window?.webContents.send('sim:powerRequestReceived', dataReceived);
+        data?.push(dataReceived);
+        ws?.send(JSON.stringify(dataReceived));
+      });
 
-        if (record) {
-          app.on('quit', () => {
-            fs.writeFileSync(file, JSON.stringify(data));
-          });
-        }
+      if (record) {
+        app.on('quit', () => {
+          const file = fs.openSync('record.json', 'a');
+          fs.writeFileSync(file, JSON.stringify(data));
+        });
       }
-    );
+    });
   });
 }
 
-function registerPlayback() {}
+function registerPlayback(app: Electron.App, o: Options) {
+  ipcMain.handle('sim:connect', (_, fligthId: string) => {
+    const timeouts: NodeJS.Timeout[] = [];
+    const window = getWindow();
+    const data: RequestData<unknown>[] = JSON.parse(
+      fs.readFileSync('record.json', 'utf8')
+    );
+    const client = o.local ? undefined : new WebSocket();
+    let ws: connection | undefined;
+    client?.connect(`ws://localhost:3000?flightId=${fligthId}`);
+
+    client?.on('connect', function open(conn) {
+      console.log('connected');
+      ws = conn;
+    });
+
+    ws?.on('error', console.error);
+
+    const initialTimestamp = new Date(data[0].createdAt).getTime();
+
+    data.forEach(item => {
+      switch (item.type) {
+        case 'postion':
+        case 'position':
+          timeouts.push(
+            setTimeout(
+              () => {
+                ws?.send(JSON.stringify(item));
+                window?.webContents.send('sim:positionRequestReceived', item);
+              },
+              new Date(item.createdAt).getTime() - initialTimestamp
+            )
+          );
+          break;
+        case 'gear':
+          timeouts.push(
+            setTimeout(
+              () => {
+                ws?.send(JSON.stringify(item));
+                window?.webContents.send('sim:gearRequestReceived', item);
+              },
+              new Date(item.createdAt).getTime() - initialTimestamp
+            )
+          );
+          break;
+        case 'flaps':
+          timeouts.push(
+            setTimeout(
+              () => {
+                ws?.send(JSON.stringify(item));
+                window?.webContents.send('sim:flapsRequestReceived', item);
+              },
+              new Date(item.createdAt).getTime() - initialTimestamp
+            )
+          );
+          break;
+        case 'lights':
+          timeouts.push(
+            setTimeout(
+              () => {
+                ws?.send(JSON.stringify(item));
+                window?.webContents.send('sim:lightsRequestReceived', item);
+              },
+              new Date(item.createdAt).getTime() - initialTimestamp
+            )
+          );
+          break;
+        case 'power':
+          timeouts.push(
+            setTimeout(
+              () => {
+                ws?.send(JSON.stringify(item));
+                window?.webContents.send('sim:powerRequestReceived', item);
+              },
+              new Date(item.createdAt).getTime() - initialTimestamp
+            )
+          );
+          break;
+      }
+    });
+
+    app.on('quit', () => timeouts.forEach(item => clearTimeout(item)));
+  });
+}
 
 function registerPositionDataRequest(
   handle: SimConnectConnection,
@@ -109,7 +214,7 @@ function registerPositionDataRequest(
     if (recvSimObjectData.requestID !== REQUEST_ID) return;
 
     const dataObj: RequestData<PositionRequestPayload> = {
-      type: 'postion',
+      type: 'position',
       createdAt: new Date(),
       payload: {
         timestamp: Date.now(),
@@ -148,7 +253,7 @@ function registerGearDataRequest(
     if (recvSimObjectData.requestID !== REQUEST_ID) return;
 
     const dataObj: RequestData<GearRequestPayload> = {
-      type: 'postion',
+      type: 'gear',
       createdAt: new Date(),
       payload: {
         timestamp: Date.now(),
@@ -188,7 +293,7 @@ function registerFlapsDataRequest(
     if (recvSimObjectData.requestID !== REQUEST_ID) return;
 
     const dataObj: RequestData<FlapsRequestPayload> = {
-      type: 'postion',
+      type: 'flaps',
       createdAt: new Date(),
       payload: {
         timestamp: Date.now(),
@@ -207,48 +312,45 @@ function registerFlapsDataRequest(
   });
 }
 
-// function registerAircraftDataRequest(
-//   handle: SimConnectConnection,
-//   handler: handlerFn<AircraftRequestPayload>
-// ) {
-//   const REQUEST_ID = 3;
-//   const DEFINITION_ID = 3;
+function registerPowerDataRequest(
+  handle: SimConnectConnection,
+  handler: handlerFn<PowerRequestPayload>
+) {
+  const REQUEST_ID = 3;
+  const DEFINITION_ID = 3;
 
-//   addPositionDataToDefinition(DEFINITION_ID, handle);
-//   addAircraftDataToRequest(DEFINITION_ID, handle);
+  addPositionDataToDefinition(DEFINITION_ID, handle);
+  addPowerDataToRequest(DEFINITION_ID, handle);
 
-//   handle.requestDataOnSimObject(
-//     REQUEST_ID,
-//     DEFINITION_ID,
-//     SimConnectConstants.OBJECT_ID_USER,
-//     SimConnectPeriod.SIM_FRAME
-//   );
+  handle.requestDataOnSimObject(
+    REQUEST_ID,
+    DEFINITION_ID,
+    SimConnectConstants.OBJECT_ID_USER,
+    SimConnectPeriod.SIM_FRAME
+  );
 
-//   handle.on('simObjectData', recvSimObjectData => {
-//     if (recvSimObjectData.requestID !== REQUEST_ID) return;
+  handle.on('simObjectData', recvSimObjectData => {
+    if (recvSimObjectData.requestID !== REQUEST_ID) return;
 
-//     const dataObj: RequestData<AircraftRequestPayload> = {
-//       type: 'postion',
-//       createdAt: new Date(),
-//       payload: {
-//         timestamp: Date.now(),
-//         frame,
-//         ...readPositionData(recvSimObjectData),
-//         aircraft: readAircraftRequest(recvSimObjectData),
-//       },
-//     };
+    const dataObj: RequestData<PowerRequestPayload> = {
+      type: 'power',
+      createdAt: new Date(),
+      payload: {
+        timestamp: Date.now(),
+        frame,
+        ...readPositionData(recvSimObjectData),
+        power: readPowerRequest(recvSimObjectData),
+      },
+    };
 
-//     if (
-//       lastAircraftState &&
-//       deepEqual(lastAircraftState, dataObj.payload.aircraft)
-//     ) {
-//       return;
-//     }
+    if (lastPowerState && deepEqual(lastPowerState, dataObj.payload.power)) {
+      return;
+    }
 
-//     lastAircraftState = dataObj.payload.aircraft;
-//     handler(dataObj);
-//   });
-// }
+    lastPowerState = dataObj.payload.power;
+    handler(dataObj);
+  });
+}
 
 function registerLightsDataRequest(
   handle: SimConnectConnection,
@@ -271,7 +373,7 @@ function registerLightsDataRequest(
     if (recvSimObjectData.requestID !== REQUEST_ID) return;
 
     const dataObj: RequestData<LightsRequestPayload> = {
-      type: 'postion',
+      type: 'lights',
       createdAt: new Date(),
       payload: {
         timestamp: Date.now(),

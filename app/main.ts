@@ -7,7 +7,8 @@ let win: BrowserWindow | null = null;
 const args = process.argv.slice(1),
   serve = args.some(val => val === '--serve'),
   record = args.some(val => val === '--record'),
-  playback = args.some(val => val === '---playback');
+  local = args.some(val => val === '--local'),
+  playback = args.some(val => val === '--playback');
 
 function createWindow(): BrowserWindow {
   const size = {
@@ -15,7 +16,6 @@ function createWindow(): BrowserWindow {
     height: 720,
   };
 
-  // Create the browser window.
   win = new BrowserWindow({
     x: 0,
     y: 0,
@@ -33,18 +33,13 @@ function createWindow(): BrowserWindow {
   if (serve) {
     win.loadURL('http://localhost:4200');
   } else {
-    // Path when running electron executable
-    const pathIndex = '../dist/webapp/browser/index.html';
+    const pathIndex = '../webapp/browser/index.html';
 
     const url = path.join(__dirname, pathIndex);
     win.loadFile(url);
   }
 
-  // Emitted when the window is closed.
   win.on('closed', () => {
-    // Dereference the window object, usually you would store window
-    // in an array if your app supports multi windows, this is the time
-    // when you should delete the corresponding element.
     win = null;
   });
 
@@ -76,7 +71,7 @@ try {
   });
 
   registerIpcMain(app);
-  registerSimConnect(app, record, playback);
+  registerSimConnect(app, { record, playback, local });
 } catch (e) {
   // Catch Error
   // throw e;
