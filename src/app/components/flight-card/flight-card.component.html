@@ -40,21 +40,41 @@
           <span>{{ flight.arrivalTime | date: 'dd.MM.YYYY HH:mm' }}</span>
         </div>
       </div>
-      <div fxLayout="row" fxLayoutAlign="space-between center" class="actions">
-        <div
-          matTooltip="Please use acars app!"
-          [matTooltipDisabled]="isElectron">
-          <button
-            mat-raised-button
-            [disabled]="!isElectron"
-            color="primary"
-            (click)="startFlight()">
-            Start Flight
+      <div
+        fxLayout="row"
+        [fxLayoutAlign]="
+          currentFlightState.isInProgress
+            ? 'center center'
+            : 'space-between center'
+        "
+        class="actions">
+        @if (!currentFlightState.isInProgress) {
+          <div
+            matTooltip="Please use acars app!"
+            [matTooltipDisabled]="isElectron">
+            <button
+              mat-raised-button
+              [disabled]="!isElectron"
+              color="primary"
+              (click)="startFlight()">
+              Start Flight
+            </button>
+          </div>
+          <button mat-stroked-button color="accent" (click)="cancelFlight()">
+            Cancel Flight
           </button>
-        </div>
-        <button mat-stroked-button color="accent" (click)="cancelFlight()">
-          Cancel Flight
-        </button>
+        } @else {
+          <div
+            matTooltip="Please use acars app!"
+            [matTooltipDisabled]="isElectron">
+            <button
+              mat-raised-button
+              [disabled]="!isElectron"
+              [routerLink]="'/logger/' + flight.id">
+              Show Flight status
+            </button>
+          </div>
+        }
       </div>
     }
   </mat-card-content>

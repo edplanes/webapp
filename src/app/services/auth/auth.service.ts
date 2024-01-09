@@ -1,6 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import {
+  BehaviorSubject,
   Observable,
   ObservableInput,
   catchError,
@@ -19,7 +20,6 @@ import { LogService } from '../log/log.service';
 import { UserAlreadyExists } from '../../shared/errors/UserAlreadyExists';
 import { UserNotFound } from '../../shared/errors/UserNotFound';
 import { AuthClient } from '../../clients/auth.client';
-import { AuthState } from './authState';
 
 export const authGuard: CanActivateFn = (
   route: ActivatedRouteSnapshot,
@@ -38,7 +38,8 @@ export const authGuard: CanActivateFn = (
   providedIn: 'root',
 })
 export class AuthService {
-  public readonly authState: AuthState = AuthState.getInstance();
+  public readonly authState: BehaviorSubject<IAuthInfo | undefined> =
+    new BehaviorSubject<IAuthInfo | undefined>(undefined);
 
   public get authenticatedUser(): IUser | undefined {
     if (!this.isAuthenticated) return undefined;
@@ -90,10 +91,10 @@ export class AuthService {
   }
 
   logout() {
+    this.authState.next(undefined);
     localStorage.removeItem('id_token');
     localStorage.removeItem('expires_at');
     localStorage.removeItem('user');
-    this.authState.next(undefined);
   }
 
   isLoggedIn(): Observable<boolean> {
@@ -112,10 +113,6 @@ export class AuthService {
       JSON.stringify(authResult.expiresAt.valueOf())
     );
     localStorage.setItem('user', JSON.stringify(authResult.payload));
-  }
-
-  private getExpiration() {
-    return this.authState.getValue()?.expiresAt;
   }
 
   private handleError(

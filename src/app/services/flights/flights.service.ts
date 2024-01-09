@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { FlightsClient } from '../../clients/flights.client';
-import { AuthState } from '../auth/authState';
 import { HttpErrorResponse } from '@angular/common/http';
 import { catchError, first, throwError } from 'rxjs';
 import { FlightNotFoundError } from './errors/FlightNotFoundError';
@@ -9,6 +8,7 @@ import { Airport } from '../airports/airport.service';
 import { Aircraft } from '../../clients/aircrafts.client';
 import { LogService } from '../log/log.service';
 import dayjs from 'dayjs';
+import { AuthService } from '../auth/auth.service';
 
 @Injectable({
   providedIn: 'root',
@@ -16,12 +16,12 @@ import dayjs from 'dayjs';
 export class FlightsService {
   constructor(
     private flightsClient: FlightsClient,
-    private authState: AuthState,
+    private authService: AuthService,
     private logger: LogService
   ) {}
 
   fetchNextFlight() {
-    const userId = this.authState.getValue()!.payload.id;
+    const userId = this.authService.authState.getValue()!.payload.id;
 
     return this.flightsClient
       .fetchNextFlight(userId)
@@ -29,7 +29,7 @@ export class FlightsService {
   }
 
   bookFlight(flight: FlightInput) {
-    const userId = this.authState.getValue()!.payload.id;
+    const userId = this.authService.authState.getValue()!.payload.id;
 
     this.logger.debug(`Creating new flight for user ${userId}`, flight);
 
@@ -130,7 +130,7 @@ export class FlightsService {
     return {
       callsign: flightIn.callsign,
       pilot: {
-        id: this.authState.getValue()!.payload.id,
+        id: this.authService.authState.getValue()!.payload.id,
       },
       departure: {
         id: flightIn.departure.id,

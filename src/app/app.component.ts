@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   ActivatedRoute,
@@ -20,6 +20,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { AuthService } from './services/auth/auth.service';
 import { MatDividerModule } from '@angular/material/divider';
 import { ElectronService } from './services/electron/electron.service';
+import { LoggerService } from './services/logger/logger.service';
 
 interface NavigationOption {
   path: string;
@@ -47,7 +48,7 @@ interface NavigationOption {
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, OnDestroy {
   isHeadless = false;
   currentTime = new Date();
   currentUTCTime = new Date(
@@ -79,11 +80,20 @@ export class AppComponent implements OnInit {
     private router: Router,
     private authService: AuthService,
     private route: ActivatedRoute,
-    private electron: ElectronService
+    private electron: ElectronService,
+    private flightLogger: LoggerService
   ) {
-    this.authService.isLoggedIn().subscribe(value => {
-      this.displayedPaths = this.getMenuPaths(value);
+    this.authService.isLoggedIn().subscribe(() => {
+      this.displayedPaths = this.getMenuPaths();
     });
+    this.flightLogger.loggerState.asObservable().subscribe(value => {
+      this.displayedPaths = this.getMenuPaths();
+      console.log(value);
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
   }
 
   ngOnInit(): void {
@@ -93,7 +103,7 @@ export class AppComponent implements OnInit {
       body.classList.toggle('darkMode', darkMode!);
     });
 
-    timer(0, 1000)
+    this.subscription = timer(0, 1000)
       .pipe(map(() => new Date()))
       .subscribe(time => {
         this.currentTime = time;
@@ -114,7 +124,7 @@ export class AppComponent implements OnInit {
 
   logout() {
     this.authService.logout();
-    this.router.navigateByUrl('/');
+    this.router.navigateByUrl('/login');
   }
 
   onCloseClick() {
@@ -129,16 +139,24 @@ export class AppComponent implements OnInit {
     return window.matchMedia('(prefers-color-scheme: dark)').matches;
   }
 
-  private getMenuPaths(isAuthenticated: boolean): NavigationOption[] {
-    if (!isAuthenticated) {
-      return [];
+  private getMenuPaths(): NavigationOption[] {
+    const paths: NavigationOption[] = [];
+    if (!this.authService.isAuthenticated) {
+      return paths;
     }
 
-    return [
-      {
-        path: '/user',
-        displayName: 'Dashboard',
-      },
-    ];
+    paths.push({
+      path: '/user',
+      displayName: 'Dashboard',
+    });
+
+    if (this.flightLogger.isConnected) {
+      paths.push({
+        path: `/logger/${this.flightLogger.isConnected}`,
+        displayName: 'Logger',
+      });
+    }
+
+    return paths;
   }
 }

@@ -5,8 +5,9 @@ import { registerSimConnect } from './simconnect';
 import EventEmitter from 'events';
 import { RequestData } from './simconnect/types';
 import { writeFileSync } from 'fs';
-import WebSocket, { connection } from 'websocket';
-import { log } from './util/log';
+import { io, Socket } from 'socket.io-client';
+import { logger } from './util/log';
+import { RecvOpen } from 'node-simconnect';
 
 let win: BrowserWindow | null = null;
 const args = process.argv.slice(1),
@@ -52,12 +53,32 @@ function createWindow(): BrowserWindow {
 }
 
 try {
+  const eventer = new EventEmitter();
   // This method will be called when Electron has finished
   // initialization and is ready to create browser windows.
   // Some APIs can only be used after this event occurs.
   // Added 400 ms to fix the black background issue while using transparent window. More detais at https://github.com/electron/electron/issues/15947
   app.on('ready', () => {
-    setTimeout(createWindow, 400);
+    setTimeout(() => {
+      win = createWindow();
+      logger.debug('App initializaiton...');
+      eventer.on('flight:started', (flightId, token, recvOpen: RecvOpen) => {
+        logger.debug('Flight started', flightId, recvOpen);
+        win?.webContents.send('flight:started', flightId, recvOpen);
+      });
+
+      eventer.on('sim:dataReceived', data => {
+        win?.webContents.send('sim:dataReceived', JSON.stringify(data));
+      });
+
+      eventer.on('flight:close', () => {
+        logger.info('Closing flight...');
+        win?.webContents.send('flight:close');
+      });
+      registerIpcMain(app);
+      registerSimConnect(app, eventer, playback);
+      logger.debug('App initialized successfully!');
+    }, 400);
   });
 
   // Quit when all windows are closed.
@@ -77,7 +98,6 @@ try {
     }
   });
 
-  const eventer = new EventEmitter();
   if (record) {
     const dataPoints: RequestData<unknown>[] = [];
     eventer.on('sim:dataReceived', data => {
@@ -90,31 +110,39 @@ try {
   }
 
   if (!local) {
-    let ws: connection | undefined;
+    let socket: Socket | undefined;
+
     eventer.on('flight:started', (flightId: string, token: string) => {
-      log('Connecting...', flightId);
-      const client = new WebSocket.client();
-      client.connect(`ws://localhost:3000?flightId=${flightId}`);
-      client.on('connect', (conn: connection) => {
-        log('connected');
-        ws = conn;
-      });
-      client.on('connectFailed', err => log('WS Err', err));
-      client.on('httpResponse', log);
+      logger.info('Connecting...', flightId);
+      socket = io(`ws://localhost:3000?flight=${flightId}&token=${token}`);
     });
+
+    let buffer: unknown[] = [];
 
     eventer.on('sim:dataReceived', data => {
-      ws?.send(JSON.stringify(data));
+      if (socket?.connected && buffer.length > 0) {
+        buffer.forEach(item => socket?.emit('sim:data', item));
+        buffer = [];
+      } else {
+        if (!socket?.connected) {
+          buffer.push(data);
+          return;
+        }
+      }
+
+      socket.emit('sim:data', data);
     });
 
-    eventer.on('flight:close', () => {
-      log('CLosing flight...');
-      ws?.close();
+    eventer.on('flight:closed', () => {
+      logger.info('Closing reporting server connection...');
+      socket?.disconnect();
     });
+
+    // eventer.on('flight:closed', () => {
+    //   logger.info('CLosing flight...');
+    //   ws?.close();
+    // });
   }
-
-  registerIpcMain(app);
-  registerSimConnect(app, eventer, playback);
 } catch (e) {
   // Catch Error
   // throw e;

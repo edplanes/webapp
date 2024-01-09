@@ -41,6 +41,7 @@ import {
   readAircraftRequest,
 } from './aircraftRequest';
 import EventEmitter from 'events';
+import { logger } from '../util/log';
 
 export type Options = {
   record: boolean;
@@ -68,28 +69,27 @@ export const registerSimConnect = (
 
 function registerNormalOperation(app: Electron.App, eventer: EventEmitter) {
   ipcMain.handle('sim:connect', (_, fligthId: string, token: string) => {
-    open('edplanes-acars', Protocol.KittyHawk).then(({ recvOpen, handle }) => {
-      const window = getWindow();
-      window?.webContents.send('sim:connected', recvOpen);
-      eventer.emit('flight:started', fligthId, token);
+    open('edplanes-acars', Protocol.KittyHawk).then(
+      ({ recvOpen, handle }): void => {
+        eventer.emit('flight:started', fligthId, token, recvOpen);
 
-      const handler = (dataReceived: RequestData<unknown>) => {
-        window?.webContents.send('sim:dataReceived', dataReceived);
-        eventer.emit('sim:dataReceived', dataReceived);
-      };
+        const handler = (dataReceived: RequestData<unknown>) => {
+          eventer.emit('sim:dataReceived', dataReceived);
+        };
 
-      registerPositionDataRequest(handle, handler);
-      registerGearDataRequest(handle, handler);
-      registerLightsDataRequest(handle, handler);
-      registerFlapsDataRequest(handle, handler);
-      registerPowerDataRequest(handle, handler);
-      registerAircraftDataRequest(handle, handler);
+        registerPositionDataRequest(handle, handler);
+        registerGearDataRequest(handle, handler);
+        registerLightsDataRequest(handle, handler);
+        registerFlapsDataRequest(handle, handler);
+        registerPowerDataRequest(handle, handler);
+        registerAircraftDataRequest(handle, handler);
 
-      ipcMain.handle('flight:close', () => {
-        handle.close();
-        eventer.emit('flight:closed');
-      });
-    });
+        ipcMain.handle('flight:close', () => {
+          handle.close();
+          eventer.emit('flight:closed');
+        });
+      }
+    );
   });
 }
 
@@ -104,11 +104,16 @@ function registerPlayback(app: Electron.App, eventer: EventEmitter) {
     eventer.emit('flight:closed');
   });
   ipcMain.handle('sim:connect', (_, fligthId: string, token: string) => {
+    logger.debug('Starting flight...', fligthId);
     const data: RequestData<unknown>[] = JSON.parse(
       fs.readFileSync('record.json', 'utf8')
     );
-    eventer.emit('flight:started', fligthId, token);
-    window?.webContents.send('sim:connected');
+    eventer.emit('flight:started', fligthId, token, {
+      applicationBuildMajor: 0,
+      applicationBuildMinor: 0,
+      applicationVersionMajor: 0,
+      applicationVersionMinor: 0,
+    });
 
     const initialTimestamp = new Date(data[0].createdAt).getTime();
 
@@ -117,7 +122,6 @@ function registerPlayback(app: Electron.App, eventer: EventEmitter) {
         setTimeout(
           () => {
             eventer.emit('sim:dataReceived', item);
-            window?.webContents.send('sim:dataReceived', item);
           },
           new Date(item.createdAt).getTime() - initialTimestamp
         )

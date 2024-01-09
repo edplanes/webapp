@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { LogConsole, LogPublisher } from './log-publishers';
 import { ConfigService } from '../config/config.service';
+import { ElectronService } from '../electron/electron.service';
 
 export enum LogLevel {
   All,
@@ -21,7 +22,7 @@ export class LogService {
   publishers: LogPublisher[] = [];
   visitorId = localStorage.getItem('visitorId') || this.generateVisitorId();
 
-  constructor(configService?: ConfigService) {
+  constructor(electronService: ElectronService, configService?: ConfigService) {
     if (!configService) configService = inject(ConfigService);
 
     configService.state$.subscribe(state => {
@@ -51,6 +52,18 @@ export class LogService {
     if (this.publishers.length == 0) {
       this.publishers.push(new LogConsole());
     }
+
+    const keys = Object.keys(LogLevel);
+    keys.forEach(key => {
+      if (Number(key) >= 0 || key === 'Off' || !electronService.isElectron)
+        return;
+      electronService.ipcRenderer.on(
+        `app:${key.toLowerCase()}`,
+        (_, msg: string, ...params: unknown[]) => {
+          this.writeLog(msg, LogLevel[key as keyof typeof LogLevel], params);
+        }
+      );
+    });
   }
 
   debug(msg: string, ...params: unknown[]) {

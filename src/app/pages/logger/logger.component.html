@@ -1,1 +1,28 @@
-<p>logger works!</p>
+<section class="flight-recorder">
+  <nav fxLayout fxLayoutAlign="space-between center">
+    <h1>Flight Recorder (id: {{ flightId }})</h1>
+    <button mat-stroked-button color="warn" (click)="close()">Close</button>
+  </nav>
+  <mat-accordion>
+    <mat-expansion-panel>
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          <span fxLayout fxLayoutAlign="space-between center">
+            @if (flightRunning) {
+              <mat-icon style="color: lightgreen">done</mat-icon>
+            } @else {
+              <mat-icon color="warn">close</mat-icon>
+            }
+            &nbsp; Simconnect status
+          </span>
+        </mat-panel-title>
+        <mat-panel-description fxLayout fxLayoutAlign="end center">
+          Simulator Version:&nbsp; {{ simulatorVersion }}
+        </mat-panel-description>
+      </mat-expansion-panel-header>
+      <pre>
+        {{ lastSimData | json }}
+      </pre>
+    </mat-expansion-panel>
+  </mat-accordion>
+</section>

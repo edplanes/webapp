@@ -1,17 +1,60 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Router } from '@angular/router';
+import { LoggerService } from '../../services/logger/logger.service';
+import { ElectronService } from '../../services/electron/electron.service';
+import { FlexLayoutModule } from '@angular/flex-layout';
+import { MatButtonModule } from '@angular/material/button';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { MatIconModule } from '@angular/material/icon';
+import { JsonPipe } from '@angular/common';
 
 @Component({
   selector: 'app-logger',
   standalone: true,
-  imports: [],
+  imports: [
+    FlexLayoutModule,
+    MatButtonModule,
+    MatExpansionModule,
+    MatIconModule,
+    JsonPipe,
+  ],
   templateUrl: './logger.component.html',
   styleUrl: './logger.component.scss',
 })
 export class LoggerComponent implements OnInit {
-  constructor(private route: ActivatedRoute) {}
+  flightRunning: boolean = false;
+  lastSimData: unknown;
+
+  get flightId() {
+    return this.loggerService.loggerState.getValue()?.flightId;
+  }
+
+  get simulatorVersion() {
+    const state = this.loggerService.loggerState.getValue().simDescription;
+
+    if (!state) return 'unknown';
+
+    return `${state.applicationBuildMajor}.${state.applicationBuildMinor}.${state.applicationVersionMajor}.${state.applicationVersionMinor}`;
+  }
+
+  constructor(
+    private router: Router,
+    private loggerService: LoggerService,
+    private electronService: ElectronService
+  ) {}
 
   ngOnInit(): void {
-    console.log(this.route.snapshot.params);
+    this.loggerService.loggerState.subscribe(() => {
+      this.flightRunning = this.loggerService.isConnected;
+    });
+
+    this.electronService.ipcRenderer.on('sim:dataReceived', (_, data) => {
+      this.lastSimData = JSON.parse(data);
+    });
+  }
+
+  close() {
+    this.electronService.ipcRenderer.invoke('flight:close');
+    this.router.navigateByUrl('/user');
   }
 }
