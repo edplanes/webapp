@@ -57,7 +57,7 @@
     "@cypress/schematic": "^2.5.1",
     "@types/deep-equal": "^1.0.4",
     "@types/jasmine": "~5.1.0",
-    "@types/node": "^20.10.6",
+    "@types/node": "^20.10.8",
     "@types/socket.io-client": "^3.0.0",
     "@types/websocket": "^1.0.10",
     "@typescript-eslint/eslint-plugin": "6.17.0",
