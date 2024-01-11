@@ -71,6 +71,10 @@ try {
         win?.webContents.send('sim:dataReceived', JSON.stringify(data));
       });
 
+      eventer.on('app:event:detected', data => {
+        win?.webContents.send('app:event:detected', JSON.stringify(data));
+      });
+
       eventer.on('flight:close', () => {
         logger.info('Closing flight...');
         win?.webContents.send('flight:close');
@@ -130,6 +134,9 @@ try {
         }
       }
 
+      socket.on('app:event:detected', event => {
+        eventer.emit('app:event:detected', event);
+      });
       socket.emit('sim:data', data);
     });
 

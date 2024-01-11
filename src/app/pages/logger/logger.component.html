@@ -25,4 +25,19 @@
       </pre>
     </mat-expansion-panel>
   </mat-accordion>
+  <mat-divider></mat-divider>
+  <mat-accordion>
+    @for (event of events; track $index) {
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            {{ event.name }}
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <pre>
+          {{ event.entry | json }}
+        </pre>
+      </mat-expansion-panel>
+    }
+  </mat-accordion>
 </section>

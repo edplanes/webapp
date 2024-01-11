@@ -7,6 +7,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatIconModule } from '@angular/material/icon';
 import { JsonPipe } from '@angular/common';
+import { MatDividerModule } from '@angular/material/divider';
 
 @Component({
   selector: 'app-logger',
@@ -17,6 +18,7 @@ import { JsonPipe } from '@angular/common';
     MatExpansionModule,
     MatIconModule,
     JsonPipe,
+    MatDividerModule,
   ],
   templateUrl: './logger.component.html',
   styleUrl: './logger.component.scss',
@@ -24,6 +26,7 @@ import { JsonPipe } from '@angular/common';
 export class LoggerComponent implements OnInit {
   flightRunning: boolean = false;
   lastSimData: unknown;
+  events: { name: string; entry: unknown }[] = [];
 
   get flightId() {
     return this.loggerService.loggerState.getValue()?.flightId;
@@ -50,6 +53,11 @@ export class LoggerComponent implements OnInit {
 
     this.electronService.ipcRenderer.on('sim:dataReceived', (_, data) => {
       this.lastSimData = JSON.parse(data);
+    });
+
+    this.electronService.ipcRenderer.on('app:event:detected', (_, data) => {
+      this.events = JSON.parse(data);
+      console.log(data);
     });
   }
 
