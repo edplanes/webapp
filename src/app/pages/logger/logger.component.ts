@@ -57,7 +57,7 @@ export class LoggerComponent implements OnInit {
 
     this.electronService.ipcRenderer.on('app:event:detected', (_, data) => {
       this.events = JSON.parse(data);
-      console.log(data);
+      console.log(this.events);
     });
   }
 
