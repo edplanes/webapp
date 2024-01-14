@@ -6,7 +6,6 @@ import { Airport } from '../services/airports/airport.service';
 
 export enum FlightStatus {
   New,
-  Opened,
   InProgress,
   Closed,
   Deleted,

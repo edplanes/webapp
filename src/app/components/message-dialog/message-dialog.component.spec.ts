@@ -8,10 +8,9 @@ describe('MessageDialogComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [MessageDialogComponent]
-    })
-    .compileComponents();
-    
+      imports: [MessageDialogComponent],
+    }).compileComponents();
+
     fixture = TestBed.createComponent(MessageDialogComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

@@ -97,10 +97,10 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    const body = document.getElementsByTagName('body')[0];
-    body.classList.toggle('darkMode', this.toogleControl.value!);
+    const body = document.querySelector('body');
+    body!.classList.toggle('darkMode', this.toogleControl.value!);
     this.toogleControl.valueChanges.subscribe(darkMode => {
-      body.classList.toggle('darkMode', darkMode!);
+      body!.classList.toggle('darkMode', darkMode!);
     });
 
     this.subscription = timer(0, 1000)
