@@ -20,12 +20,28 @@ export class FlightsService {
     private logger: LogService
   ) {}
 
+  fetchFlights() {
+    const userId = this.authService.authState.getValue()!.payload.id;
+
+    return this.flightsClient
+      .fetchFlights(userId)
+      .pipe(catchError(this.handleError), first());
+  }
+
   fetchNextFlight() {
     const userId = this.authService.authState.getValue()!.payload.id;
 
     return this.flightsClient
       .fetchNextFlight(userId)
       .pipe(catchError(this.handleError), first());
+  }
+
+  fetchPastFlights() {
+    const userId = this.authService.authState.getValue()!.payload.id;
+
+    return this.flightsClient
+      .fetchPastFlights(userId)
+      .pipe(catchError(this.handleError));
   }
 
   bookFlight(flight: FlightInput) {

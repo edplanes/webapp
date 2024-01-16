@@ -65,6 +65,8 @@ export class FlightCardComponent implements OnInit, OnDestroy {
     return {
       flightId: this.flightLogger.loggerState.value,
       isInProgress: this.flightLogger.isInProgress,
+      isClosedOrDeleted:
+        this.flight?.status === 'Closed' || this.flight?.status === 'Deleted',
     };
   }
 
@@ -146,6 +148,17 @@ export class FlightCardComponent implements OnInit, OnDestroy {
   }
 
   private fetchLastFlight() {
-    console.log(!this.isNextFlight);
+    this.flightService.fetchPastFlights().subscribe({
+      next: flights => {
+        this.logger.debug('Fetched flights', flights);
+        this.flight = flights.slice(-1)[0];
+        this.flightDistance = Math.floor(
+          this.flightService.calculateAirportsDistance(
+            this.flight!.departure,
+            this.flight!.arrival
+          )
+        );
+      },
+    });
   }
 }

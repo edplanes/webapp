@@ -1,0 +1,17 @@
+<div fxLayout="column" fxLayoutAlign="center center" class="my-flights-wrapper">
+  <nav fxLayout="row" fxLayoutAlign="space-evenly center">
+    <mat-form-field>
+      <mat-label>Wyszukaj Lot</mat-label>
+      <input
+        matInput
+        (keyup)="applyFilter($event)"
+        placeholder="Wyszukaj lot"
+        #input />
+    </mat-form-field>
+    <button mat-raised-button (click)="openBookFlightDialog()">
+      Book flight
+    </button>
+  </nav>
+
+  <app-flights-table></app-flights-table>
+</div>

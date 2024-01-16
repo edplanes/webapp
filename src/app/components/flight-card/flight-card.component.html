@@ -1,9 +1,14 @@
 <mat-card>
-  <mat-card-header fxLayout fxLayoutAlign="space-between center">
-    <mat-card-title>
-      <mat-icon>flight_takeoff</mat-icon>
-      {{ isNextFlight ? 'Next' : 'Last' }} flight
-    </mat-card-title>
+  <mat-card-header>
+    <mat-card-title-group>
+      <mat-card-title>
+        <mat-icon>flight_takeoff</mat-icon>
+        {{ isNextFlight ? 'Next' : 'Last' }} flight
+      </mat-card-title>
+      @if (flight) {
+        <span>{{ flight.rating }}/10</span>
+      }
+    </mat-card-title-group>
   </mat-card-header>
   <mat-divider></mat-divider>
   <mat-card-content fxLayout="column" fxLayoutAlign="center center">
@@ -43,12 +48,12 @@
       <div
         fxLayout="row"
         [fxLayoutAlign]="
-          currentFlightState.isInProgress
+          currentFlightState.isInProgress || !isNextFlight
             ? 'center center'
             : 'space-between center'
         "
         class="actions">
-        @if (!currentFlightState.isInProgress) {
+        @if (!currentFlightState.isInProgress && isNextFlight) {
           <div
             matTooltip="Please use acars app!"
             [matTooltipDisabled]="isElectron">
@@ -63,6 +68,12 @@
           <button mat-stroked-button color="accent" (click)="cancelFlight()">
             Cancel Flight
           </button>
+        } @else if (!isNextFlight && currentFlightState.isClosedOrDeleted) {
+          <div>
+            <button mat-raised-button [routerLink]="'/flights/' + flight.id">
+              Show flight log
+            </button>
+          </div>
         } @else {
           <div
             matTooltip="Please use acars app!"

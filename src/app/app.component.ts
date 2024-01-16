@@ -60,12 +60,12 @@ export class AppComponent implements OnInit, OnDestroy {
 
   get isDispatcher() {
     const roles = this.authService.authenticatedUser?.roles;
-    return (
-      roles &&
-      (roles.includes('ADMIN') ||
-        roles.includes('DISPATCHER') ||
-        roles.includes('MANAGEMENT'))
-    );
+    return roles && (roles.includes('ADMIN') || roles.includes('DISPATCHER'));
+  }
+
+  get isAdmin() {
+    const roles = this.authService.authenticatedUser?.roles;
+    return roles && roles.includes('ADMIN');
   }
 
   get currentUser() {
@@ -150,12 +150,34 @@ export class AppComponent implements OnInit, OnDestroy {
       displayName: 'Dashboard',
     });
 
+    paths.push({
+      path: '/flights/my',
+      displayName: 'My Flights',
+    });
+
     if (this.flightLogger.isConnected) {
       paths.push({
         path: `/logger/${this.flightLogger.isConnected}`,
         displayName: 'Logger',
       });
     }
+
+    if (this.isDispatcher) {
+      paths.push({
+        path: `/routes`,
+        displayName: 'Schedule Flights',
+      });
+      paths.push({
+        path: `/aircrafts`,
+        displayName: 'Aircrafts',
+      });
+    }
+
+    if (this.isAdmin)
+      paths.push({
+        path: `/airframes`,
+        displayName: 'Airframes',
+      });
 
     return paths;
   }

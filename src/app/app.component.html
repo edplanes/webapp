@@ -55,13 +55,6 @@
       </button>
       <mat-menu #menu="matMenu">
         @if (currentUser) {
-          <button mat-menu-item routerLink="user/profile">Profile</button>
-          <button mat-menu-item routerLink="user/settings">Settings</button>
-          <mat-divider></mat-divider>
-          @if (isDispatcher) {
-            <button mat-menu-item routerLink="dispatch">Dispatcher</button>
-          }
-          <mat-divider></mat-divider>
           <button mat-menu-item (click)="logout()">Logout</button>
         } @else {
           <button mat-menu-item routerLink="login">Login</button>

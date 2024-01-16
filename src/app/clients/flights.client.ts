@@ -5,10 +5,10 @@ import { IUser } from '../models/auth.model';
 import { Airport } from '../services/airports/airport.service';
 
 export enum FlightStatus {
-  New,
-  InProgress,
-  Closed,
-  Deleted,
+  New = 'New',
+  InProgress = 'InProgress',
+  Closed = 'Closed',
+  Deleted = 'Deleted',
 }
 
 export interface Flight {
@@ -23,6 +23,7 @@ export interface Flight {
   duration: number;
   departure: Airport;
   arrival: Airport;
+  rating: number;
 }
 
 @Injectable({
@@ -32,6 +33,18 @@ export class FlightsClient extends APIClient {
   fetchNextFlight(userId: string) {
     return this.http.get<Flight>(
       `${this.apiServerBaseUrl}/users/${userId}/flights/next`
+    );
+  }
+
+  fetchPastFlights(userId: string) {
+    return this.http.get<Flight[]>(
+      `${this.apiServerBaseUrl}/users/${userId}/flights/past`
+    );
+  }
+
+  fetchFlights(userId: string) {
+    return this.http.get<Flight[]>(
+      `${this.apiServerBaseUrl}/users/${userId}/flights`
     );
   }
 
