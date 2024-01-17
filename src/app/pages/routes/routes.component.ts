@@ -11,6 +11,7 @@ import { MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatDialog } from '@angular/material/dialog';
 import { AddNewRouteComponent } from '../../components/add-new-route/add-new-route.component';
+import { Airframe } from '../../clients/aircrafts.client';
 
 @Component({
   selector: 'app-routes',
@@ -38,7 +39,6 @@ export class RoutesComponent implements OnInit {
     'id',
     'callsign',
     'allowedAircrafts',
-    'duration',
     'departure',
     'arrival',
     'edit',
@@ -53,9 +53,7 @@ export class RoutesComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.routesClient.fetchRoutes().subscribe(routes => {
-      this.datasource.data = routes;
-    });
+    this.fetchRoutes();
   }
 
   applyFilter(event: Event) {
@@ -64,9 +62,28 @@ export class RoutesComponent implements OnInit {
 
   openAddRouteDialog() {
     const dialogRef = this.dialog.open(AddNewRouteComponent);
+    dialogRef.afterClosed().subscribe((result: boolean) => {
+      if (!result) return;
+
+      this.fetchRoutes();
+    });
   }
 
   openEditRouteDialog(id: string) {}
 
-  deleteRoute(id: string) {}
+  deleteRoute(id: string) {
+    this.routesClient.deleteRoute(id).subscribe(() => {
+      this.fetchRoutes();
+    });
+  }
+
+  displayAirframes(airframes: Airframe[]) {
+    return airframes.map(airframe => airframe.icao).join(',');
+  }
+
+  private fetchRoutes() {
+    this.routesClient.fetchRoutes().subscribe(routes => {
+      this.datasource.data = routes;
+    });
+  }
 }

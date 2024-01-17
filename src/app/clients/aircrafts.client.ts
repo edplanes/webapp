@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { APIClient } from '../shared/APIClient';
 
 export interface Airframe {
+  id: string;
   icao: string;
   name: string;
   purpose: string;

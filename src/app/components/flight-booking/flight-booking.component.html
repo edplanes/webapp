@@ -8,17 +8,11 @@
     <mat-step>
       <ng-template matStepLabel>Choose flight type</ng-template>
       <div fxLayout fxLayout="center center">
-        <button
-          mat-stroked-button
-          (click)="selectFlightType('freeflight')"
-          matStepperNext>
-          Free Flight
-        </button>
-        <button
-          mat-stroked-button
-          disabled
-          (click)="selectFlightType('scheduled')">
+        <button mat-stroked-button (click)="selectFlightType('scheduled')">
           Scheduled Flight
+        </button>
+        <button mat-stroked-button (click)="selectFlightType('freeflight')">
+          Free Flight
         </button>
       </div>
     </mat-step>

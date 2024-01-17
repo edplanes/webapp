@@ -104,9 +104,13 @@ export class AddNewRouteComponent implements OnInit {
     this.routeClient
       .addRoute({
         ...this.routeForm.value,
-        aircrafts: this.selectedAirframes,
+        allowedAirframes: this.selectedAirframes.map(value => ({
+          id: value.id,
+        })),
       })
       .subscribe(console.log);
+
+    this.dialogRef.close(true);
   }
 
   searchAircraft(event: Event) {

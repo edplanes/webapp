@@ -63,7 +63,7 @@ export class FlightBookingComponent implements OnInit {
   filteredAircrafts: Aircraft[] = [];
 
   get skipRouteSelection() {
-    return this.flightType === 'scheduled';
+    return this.flightType !== 'scheduled';
   }
 
   constructor(
@@ -148,8 +148,8 @@ export class FlightBookingComponent implements OnInit {
   }
 
   selectFlightType(flightType: string) {
-    console.log(this.stepper!.steps.get(1)?.state);
     this.flightType = flightType;
+    console.log(this.stepper!.steps.get(1)?.state, this.flightType);
 
     if (this.skipRouteSelection) {
       // Workaround until: https://github.com/angular/components/issues/17294
