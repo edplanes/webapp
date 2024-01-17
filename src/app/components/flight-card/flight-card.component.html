@@ -5,7 +5,7 @@
         <mat-icon>flight_takeoff</mat-icon>
         {{ isNextFlight ? 'Next' : 'Last' }} flight
       </mat-card-title>
-      @if (flight) {
+      @if (flight && flight.rating && !isNextFlight) {
         <span>{{ flight.rating }}/10</span>
       }
     </mat-card-title-group>

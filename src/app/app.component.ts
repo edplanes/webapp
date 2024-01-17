@@ -140,20 +140,21 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   private getMenuPaths(): NavigationOption[] {
-    const paths: NavigationOption[] = [];
+    let paths: NavigationOption[] = [];
     if (!this.authService.isAuthenticated) {
       return paths;
     }
 
-    paths.push({
-      path: '/user',
-      displayName: 'Dashboard',
-    });
-
-    paths.push({
-      path: '/flights/my',
-      displayName: 'My Flights',
-    });
+    paths = [
+      {
+        path: '/user',
+        displayName: 'Dashboard',
+      },
+      {
+        path: '/flights/my',
+        displayName: 'My Flights',
+      },
+    ];
 
     if (this.flightLogger.isConnected) {
       paths.push({

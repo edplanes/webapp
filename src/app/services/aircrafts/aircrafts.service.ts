@@ -10,4 +10,8 @@ export class AircraftsService {
   searchAircraft(search: string) {
     return this.aircraftClient.searchAircraft(search);
   }
+
+  searchAirframe(search: string) {
+    return this.aircraftClient.searchAirframe(search);
+  }
 }

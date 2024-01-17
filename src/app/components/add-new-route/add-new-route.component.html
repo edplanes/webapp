@@ -1,0 +1,73 @@
+<form [formGroup]="routeForm" fxLayout="column" fxLayoutAlign="center center">
+  <mat-form-field>
+    <mat-label>Callsign</mat-label>
+    <input matInput formControlName="callsign" placeholder="Ex. PFF15T" />
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>Departure</mat-label>
+    <input
+      matInput
+      formControlName="departure"
+      placeholder="Ex. EPKK"
+      [matAutocomplete]="autoDeparture" />
+    <mat-autocomplete
+      #autoDeparture="matAutocomplete"
+      [displayWith]="displayAirport">
+      @for (airport of filteredDepartures; track airport.icao) {
+        <mat-option [value]="airport">
+          {{ displayAirport(airport) }}
+        </mat-option>
+      }
+    </mat-autocomplete>
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>Arrival</mat-label>
+    <input
+      matInput
+      formControlName="arrival"
+      placeholder="Ex. EPKT"
+      [matAutocomplete]="autoArrival" />
+    <mat-autocomplete
+      #autoArrival="matAutocomplete"
+      [displayWith]="displayAirport">
+      @for (airport of filteredArrivals; track airport.icao) {
+        <mat-option [value]="airport">
+          {{ displayAirport(airport) }}
+        </mat-option>
+      }
+    </mat-autocomplete>
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>Airframes</mat-label>
+    <input
+      matInput
+      placeholder="Ex. b738"
+      (keyup)="searchAircraft($event)"
+      [matAutocomplete]="autoAircraft" />
+    <mat-autocomplete
+      #autoAircraft="matAutocomplete"
+      [displayWith]="displayAircraft">
+      @for (airframe of filteredAirframes; track airframe.icao) {
+        <mat-option [value]="airframe" (click)="addAirframeSelection(airframe)">
+          {{ displayAircraft(airframe) }}
+        </mat-option>
+      }
+    </mat-autocomplete>
+  </mat-form-field>
+  <div class="airframe-list-wrapper">
+    <mat-chip-listbox #airframeList>
+      @for (airframe of selectedAirframes; track airframe.icao) {
+        <mat-chip color="primary" (click)="removeAirframeSelection(airframe)">
+          {{ displayAircraft(airframe, true) }}
+          <mat-icon class="mat-chip-remove">cancel</mat-icon>
+        </mat-chip>
+      }
+    </mat-chip-listbox>
+  </div>
+  <div fxLayout fxLAyoutAlign="space-between center">
+    <button mat-dialog-close mat-stroked-button>Close</button>
+    <button mat-raised-button (click)="onSubmit()" color="accent">
+      Book Flight
+    </button>
+  </div>
+</form>

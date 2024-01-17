@@ -1,1 +1,82 @@
-<p>routes works!</p>
+<div fxLayout="column" fxLayoutAlign="center center" class="my-routes-wrapper">
+  <nav fxLayout="row" fxLayoutAlign="space-evenly center">
+    <mat-form-field>
+      <mat-label>Wyszukaj Trasę</mat-label>
+      <input
+        matInput
+        (keyup)="applyFilter($event)"
+        placeholder="Wyszukaj lot"
+        #input />
+    </mat-form-field>
+    <button mat-raised-button (click)="openAddRouteDialog()">Add route</button>
+  </nav>
+
+  <div class="mat-elevation-z8">
+    <table mat-table [dataSource]="datasource" matSort>
+      <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>ID</th>
+        <td mat-cell *matCellDef="let row">{{ row.id }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="callsign">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Callsign</th>
+        <td mat-cell *matCellDef="let row">{{ row.callsign }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="departure">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
+          Departure Airport
+        </th>
+        <td mat-cell *matCellDef="let row">{{ row.departure.icao }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="arrival">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
+          Arrival Airport
+        </th>
+        <td mat-cell *matCellDef="let row">{{ row.arrival.icao }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="allowedAircrafts">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
+          AllowedAircrafts
+        </th>
+        <td mat-cell *matCellDef="let row">{{ row.allowedAircrafts }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="duration">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Duration</th>
+        <td mat-cell *matCellDef="let row">{{ row.duration }} min</td>
+      </ng-container>
+
+      <ng-container matColumnDef="edit">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Edit</th>
+        <td mat-cell *matCellDef="let row">
+          <button mat-icon-button (click)="openEditRouteDialog(row.id)">
+            <mat-icon>edit</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="delete">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Delete</th>
+        <td mat-cell *matCellDef="let row">
+          <button mat-icon-button (click)="deleteRoute(row.id)">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+
+      <tr class="mat-row" *matNoDataRow>
+        <td class="mat-cell" colspan="4">No data matching the filter</td>
+      </tr>
+    </table>
+
+    <mat-paginator
+      [pageSizeOptions]="[5, 10, 25, 100]"
+      aria-label="Select page of users"></mat-paginator>
+  </div>
+</div>

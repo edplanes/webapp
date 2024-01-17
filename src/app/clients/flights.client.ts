@@ -23,7 +23,9 @@ export interface Flight {
   duration: number;
   departure: Airport;
   arrival: Airport;
-  rating: number;
+  rating?: number;
+  events?: any;
+  penalties?: any;
 }
 
 @Injectable({
