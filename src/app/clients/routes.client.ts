@@ -2,11 +2,12 @@
 import { Injectable } from '@angular/core';
 import { APIClient } from '../shared/APIClient';
 import { Airport } from '../services/airports/airport.service';
+import { Airframe } from './aircrafts.client';
 
 export interface Route {
   id: string;
   callsign: string;
-  aircrafts: any[];
+  allowedAirframes: Airframe[];
   duration: number;
   departure: Airport;
   arrival: Airport;

@@ -7,11 +7,21 @@ import { AircraftsClient } from '../../clients/aircrafts.client';
 export class AircraftsService {
   constructor(private aircraftClient: AircraftsClient) {}
 
-  searchAircraft(search: string) {
+  searchAircraft(search?: string) {
+    if (!search) {
+      return this.aircraftClient.fetchAircrafts();
+    }
+
     return this.aircraftClient.searchAircraft(search);
   }
 
-  searchAirframe(search: string) {
+  searchAirframe(search?: string) {
+    if (!search) {
+      return this.aircraftClient.fetchAirframes();
+    }
+
     return this.aircraftClient.searchAirframe(search);
   }
+
+  addAirframe();
 }

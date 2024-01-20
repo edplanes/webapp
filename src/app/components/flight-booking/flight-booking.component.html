@@ -1,117 +1,152 @@
-<h1 mat-dialog-title>Book new flight</h1>
-<div mat-dialog-content>
-  <mat-stepper
-    labelPosition="bottom"
-    orientation="horizontal"
-    #stepper
-    [linear]="true">
-    <mat-step>
-      <ng-template matStepLabel>Choose flight type</ng-template>
-      <div fxLayout fxLayout="center center">
-        <button mat-stroked-button (click)="selectFlightType('scheduled')">
-          Scheduled Flight
-        </button>
-        <button mat-stroked-button (click)="selectFlightType('freeflight')">
-          Free Flight
-        </button>
-      </div>
-    </mat-step>
-    <mat-step
-      [completed]="skipRouteSelection"
-      [editable]="!skipRouteSelection"
-      [optional]="!skipRouteSelection">
-      <ng-template matStepLabel>Choose Route</ng-template>
-    </mat-step>
-    <mat-step
-      [stepControl]="detailsForm"
-      fxLayout
-      fxLayoutAlign="center center">
-      <ng-template matStepLabel>Finalize</ng-template>
-      <form
-        [formGroup]="detailsForm"
-        fxLayout="column"
-        fxLayoutAlign="center center"
-        (ngSubmit)="onSubmit()">
-        <mat-form-field>
-          <mat-label>Callsign</mat-label>
-          <input matInput formControlName="callsign" placeholder="Ex. PFF15T" />
-        </mat-form-field>
-        <mat-form-field>
-          <mat-label>Departure</mat-label>
-          <input
-            matInput
-            formControlName="departure"
-            placeholder="Ex. EPKK"
-            [matAutocomplete]="autoDeparture" />
-          <mat-autocomplete
-            #autoDeparture="matAutocomplete"
-            [displayWith]="displayAirport">
-            @for (airport of filteredDepartures; track airport.icao) {
-              <mat-option [value]="airport">
-                {{ displayAirport(airport) }}
-              </mat-option>
-            }
-          </mat-autocomplete>
-        </mat-form-field>
-        <mat-form-field>
-          <mat-label>Arrival</mat-label>
-          <input
-            matInput
-            formControlName="arrival"
-            placeholder="Ex. EPKT"
-            [matAutocomplete]="autoArrival" />
-          <mat-autocomplete
-            #autoArrival="matAutocomplete"
-            [displayWith]="displayAirport">
-            @for (airport of filteredArrivals; track airport.icao) {
-              <mat-option [value]="airport">
-                {{ displayAirport(airport) }}
-              </mat-option>
-            }
-          </mat-autocomplete>
-        </mat-form-field>
-        <mat-form-field>
-          <mat-label>Aircraft</mat-label>
-          <input
-            matInput
-            formControlName="aircraft"
-            placeholder="Ex. b738"
-            [matAutocomplete]="autoAircraft" />
-          <mat-autocomplete
-            #autoAircraft="matAutocomplete"
-            [displayWith]="displayAircraft">
-            @for (aircraft of filteredAircrafts; track aircraft.airframe.icao) {
-              <mat-option [value]="aircraft">
-                {{ displayAircraft(aircraft) }}
-              </mat-option>
-            }
-          </mat-autocomplete>
-        </mat-form-field>
-        <mat-form-field (click)="helloInput.showPicker()">
-          <mat-label>Departure Time</mat-label>
-          <input
-            type="datetime-local"
-            matInput
-            #helloInput
-            formControlName="departureTime" />
-
-          <mat-icon matSuffix fontIcon="today" />
-        </mat-form-field>
-        <mat-form-field>
-          <mat-label>Flight Duration</mat-label>
-          <input
-            matInput
-            placeholder="01:00"
-            formControlName="duration"
-            appDurationPicker />
-        </mat-form-field>
-        <div fxLayout fxLAyoutAlign="space-between center">
-          <button mat-dialog-close mat-stroked-button>Close</button>
-          <button mat-raised-button type="submit" color="accent">
-            Book Flight
+<div class="dialog-booking-container">
+  <h1 mat-dialog-title>Book new flight</h1>
+  <div mat-dialog-content>
+    <mat-stepper
+      labelPosition="bottom"
+      orientation="horizontal"
+      #stepper
+      [linear]="true">
+      <mat-step>
+        <ng-template matStepLabel>Choose flight type</ng-template>
+        <div fxLayout fxLayout="center center">
+          <button mat-stroked-button (click)="selectFlightType('scheduled')">
+            Scheduled Flight
+          </button>
+          <button mat-stroked-button (click)="selectFlightType('freeflight')">
+            Free Flight
           </button>
         </div>
-      </form>
-    </mat-step>
-  </mat-stepper>
+      </mat-step>
+      <mat-step
+        [completed]="skipRouteSelection"
+        [editable]="!skipRouteSelection"
+        [optional]="!skipRouteSelection">
+        <ng-template matStepLabel>Choose Route</ng-template>
+        <div fxLayout="row wrap" fxLayoutAlign="center center">
+          @for (item of routes; track $index) {
+            <button
+              mat-stroked-button
+              class="schedule-flight-selection"
+              (click)="scheduleFlightSelected($index)">
+              <div fxLayout="column" fxLayoutAlign="center center">
+                <h4>{{ item.callsign }}</h4>
+                <div fxLayout="row" fxLayoutAlign="space-between center">
+                  <div fxLayout="column" fxLayoutAlign="center center">
+                    {{ item.departure.icao }}
+                    <span class="iata">{{ item.departure.iata }}</span>
+                  </div>
+                  <div fxLayout="column" fxLayoutAlign="center center">
+                    {{ item.arrival.icao }}
+                    <span class="iata">{{ item.arrival.iata }}</span>
+                  </div>
+                </div>
+                <div fxLayout="row" fxLayoutAlign="center center">
+                  @for (airframe of item.allowedAirframes; track $index) {
+                    <span>{{ airframe.icao }}</span>
+                  }
+                </div>
+              </div>
+            </button>
+          }
+        </div>
+      </mat-step>
+      <mat-step
+        [stepControl]="detailsForm"
+        fxLayout
+        fxLayoutAlign="center center">
+        <ng-template matStepLabel>Finalize</ng-template>
+        <form
+          [formGroup]="detailsForm"
+          fxLayout="column"
+          fxLayoutAlign="center center"
+          (ngSubmit)="onSubmit()">
+          <mat-form-field>
+            <mat-label>Callsign</mat-label>
+            <input
+              matInput
+              formControlName="callsign"
+              placeholder="Ex. PFF15T" />
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>Departure</mat-label>
+            <input
+              matInput
+              formControlName="departure"
+              placeholder="Ex. EPKK"
+              [matAutocomplete]="autoDeparture" />
+            <mat-autocomplete
+              #autoDeparture="matAutocomplete"
+              [displayWith]="displayAirport">
+              @for (airport of filteredDepartures; track airport.icao) {
+                <mat-option [value]="airport">
+                  {{ displayAirport(airport) }}
+                </mat-option>
+              }
+            </mat-autocomplete>
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>Arrival</mat-label>
+            <input
+              matInput
+              formControlName="arrival"
+              placeholder="Ex. EPKT"
+              [matAutocomplete]="autoArrival" />
+            <mat-autocomplete
+              #autoArrival="matAutocomplete"
+              [displayWith]="displayAirport">
+              @for (airport of filteredArrivals; track airport.icao) {
+                <mat-option [value]="airport">
+                  {{ displayAirport(airport) }}
+                </mat-option>
+              }
+            </mat-autocomplete>
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>Aircraft</mat-label>
+            <input
+              matInput
+              formControlName="aircraft"
+              placeholder="Ex. b738"
+              [matAutocomplete]="autoAircraft" />
+            <mat-autocomplete
+              #autoAircraft="matAutocomplete"
+              [displayWith]="displayAircraft">
+              @for (
+                aircraft of filteredAircrafts;
+                track aircraft.airframe.icao
+              ) {
+                <mat-option [value]="aircraft">
+                  {{ displayAircraft(aircraft) }}
+                </mat-option>
+              }
+            </mat-autocomplete>
+          </mat-form-field>
+          <mat-form-field (click)="helloInput.showPicker()">
+            <mat-label>Departure Time</mat-label>
+            <input
+              type="datetime-local"
+              matInput
+              #helloInput
+              formControlName="departureTime" />
+
+            <mat-icon matSuffix fontIcon="today" />
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>Flight Duration</mat-label>
+            <input
+              matInput
+              placeholder="01:00"
+              formControlName="duration"
+              appDurationPicker />
+          </mat-form-field>
+          <div fxLayout fxLAyoutAlign="space-between center">
+            <button mat-dialog-close mat-stroked-button>Close</button>
+            <button mat-raised-button type="submit" color="accent">
+              Book Flight
+            </button>
+          </div>
+        </form>
+      </mat-step>
+    </mat-stepper>
+  </div>
 </div>

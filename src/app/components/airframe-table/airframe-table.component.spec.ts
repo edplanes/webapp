@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { EditRouteComponent } from './edit-route.component';
+import { AirframeTableComponent } from './airframe-table.component';
 
-describe('EditRouteComponent', () => {
-  let component: EditRouteComponent;
-  let fixture: ComponentFixture<EditRouteComponent>;
+describe('AirframeTableComponent', () => {
+  let component: AirframeTableComponent;
+  let fixture: ComponentFixture<AirframeTableComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [EditRouteComponent]
+      imports: [AirframeTableComponent]
     })
     .compileComponents();
     
-    fixture = TestBed.createComponent(EditRouteComponent);
+    fixture = TestBed.createComponent(AirframeTableComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

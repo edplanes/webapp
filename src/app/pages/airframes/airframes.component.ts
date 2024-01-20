@@ -1,12 +1,11 @@
 import { Component } from '@angular/core';
+import { AirframeTableComponent } from '../../components/airframe-table/airframe-table.component';
 
 @Component({
   selector: 'app-airframes',
   standalone: true,
-  imports: [],
+  imports: [AirframeTableComponent],
   templateUrl: './airframes.component.html',
-  styleUrl: './airframes.component.scss'
+  styleUrl: './airframes.component.scss',
 })
-export class AirframesComponent {
-
-}
+export class AirframesComponent {}

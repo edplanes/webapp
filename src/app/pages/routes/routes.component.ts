@@ -60,16 +60,16 @@ export class RoutesComponent implements OnInit {
     this.datasource.filter = (event.target as HTMLInputElement).value;
   }
 
-  openAddRouteDialog() {
-    const dialogRef = this.dialog.open(AddNewRouteComponent);
+  openRouteDialog(row?: Route) {
+    const dialogRef = this.dialog.open(AddNewRouteComponent, {
+      data: row,
+    });
     dialogRef.afterClosed().subscribe((result: boolean) => {
       if (!result) return;
 
       this.fetchRoutes();
     });
   }
-
-  openEditRouteDialog(id: string) {}
 
   deleteRoute(id: string) {
     this.routesClient.deleteRoute(id).subscribe(() => {

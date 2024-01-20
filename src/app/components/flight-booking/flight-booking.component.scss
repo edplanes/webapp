@@ -13,3 +13,18 @@ mat-card-content {
   display: flex;
   justify-content: center;
 }
+
+.dialog-booking-container {
+  max-width: 70vw;
+}
+
+.schedule-flight-selection {
+  height: auto !important;
+  padding: 1.5rem;
+}
+
+.iata {
+  font-size: large;
+  font-weight: 500;
+  padding: 0.5rem;
+}

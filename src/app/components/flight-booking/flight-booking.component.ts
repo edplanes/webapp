@@ -30,6 +30,7 @@ import { AircraftsService } from '../../services/aircrafts/aircrafts.service';
 import { FlightsService } from '../../services/flights/flights.service';
 import { DurationPickerDirective } from '../../directives/duration-picker/duration-picker.directive';
 import dayjs from 'dayjs';
+import { Route, RoutesClient } from '../../clients/routes.client';
 
 @Component({
   selector: 'app-flight-booking',
@@ -61,6 +62,8 @@ export class FlightBookingComponent implements OnInit {
   filteredDepartures: Airport[] = [];
   filteredArrivals: Airport[] = [];
   filteredAircrafts: Aircraft[] = [];
+  selectedRoute?: Route;
+  routes: Route[] = [];
 
   get skipRouteSelection() {
     return this.flightType !== 'scheduled';
@@ -71,6 +74,7 @@ export class FlightBookingComponent implements OnInit {
     private airportService: AirportService,
     private flightsService: FlightsService,
     private aircraftService: AircraftsService,
+    private routesClient: RoutesClient,
     fb: FormBuilder
   ) {
     this.detailsForm = fb.group({
@@ -134,16 +138,53 @@ export class FlightBookingComponent implements OnInit {
       .subscribe(value => {
         typeof value == 'string' &&
           this.aircraftService.searchAircraft(value).subscribe(aircraft => {
-            this.filteredAircrafts = aircraft;
+            if (!this.selectedRoute) {
+              this.filteredAircrafts = aircraft;
+              return;
+            }
+
+            const routeAirframes = this.selectedRoute.allowedAirframes.map(
+              aiframe => aiframe.icao
+            );
+            this.filteredAircrafts = aircraft.filter(
+              aircraft => aircraft.airframe.icao in routeAirframes
+            );
           });
         typeof value == 'object' && this.updateFlightDuration();
       });
+
+    this.routesClient.fetchRoutes().subscribe(routes => {
+      this.routes = routes;
+    });
+  }
+
+  scheduleFlightSelected(routeIndex: number) {
+    const route = this.routes[routeIndex];
+
+    this.detailsForm.controls['callsign'].setValue(route.callsign);
+    this.detailsForm.controls['departure'].setValue(route.departure);
+    this.detailsForm.controls['arrival'].setValue(route.arrival);
+
+    if (!this.skipRouteSelection) {
+      this.detailsForm.controls['callsign'].disable();
+      this.detailsForm.controls['departure'].disable();
+      this.detailsForm.controls['arrival'].disable();
+    }
+
+    this.stepper?.next();
   }
 
   onSubmit() {
     if (this.detailsForm.invalid) return;
 
-    this.flightsService.bookFlight(this.detailsForm.value);
+    this.flightsService.bookFlight({
+      callsign: this.detailsForm.controls['callsign'].value,
+      departure: this.detailsForm.controls['departure'].value,
+      arrival: this.detailsForm.controls['arrival'].value,
+      aircraft: this.detailsForm.controls['aircraft'].value,
+      departureTime: this.detailsForm.controls['departureTime'].value,
+      duration: this.detailsForm.controls['duration'].value,
+    });
     this.dialogRef.close();
   }
 

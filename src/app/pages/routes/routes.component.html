@@ -8,7 +8,7 @@
         placeholder="Wyszukaj lot"
         #input />
     </mat-form-field>
-    <button mat-raised-button (click)="openAddRouteDialog()">Add route</button>
+    <button mat-raised-button (click)="openRouteDialog()">Add route</button>
   </nav>
 
   <div class="mat-elevation-z8">
@@ -49,7 +49,7 @@
       <ng-container matColumnDef="edit">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Edit</th>
         <td mat-cell *matCellDef="let row">
-          <button mat-icon-button (click)="openEditRouteDialog(row.id)">
+          <button mat-icon-button (click)="openRouteDialog(row)">
             <mat-icon>edit</mat-icon>
           </button>
         </td>

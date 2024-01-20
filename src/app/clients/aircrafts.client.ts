@@ -44,9 +44,17 @@ export class AircraftsClient extends APIClient {
     );
   }
 
+  fetchAircrafts() {
+    return this.http.get<Aircraft[]>(`${this.apiServerBaseUrl}/aircrafts`);
+  }
+
   searchAirframe(value: string) {
     return this.http.get<Airframe[]>(
       `${this.apiServerBaseUrl}/airframes?search=${value}`
     );
+  }
+
+  fetchAirframes() {
+    return this.http.get<Airframe[]>(`${this.apiServerBaseUrl}/airframes`);
   }
 }

@@ -1,5 +1,5 @@
 import { MatIconModule } from '@angular/material/icon';
-import { Component, OnInit } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { Airframe } from '../../clients/aircrafts.client';
 import {
   Airport,
@@ -11,9 +11,12 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import {
+  MAT_DIALOG_DATA,
+  MatDialogModule,
+  MatDialogRef,
+} from '@angular/material/dialog';
 import { AircraftsService } from '../../services/aircrafts/aircrafts.service';
-import { FlightsService } from '../../services/flights/flights.service';
 import { FlightBookingComponent } from '../flight-booking/flight-booking.component';
 import { startWith } from 'rxjs';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -24,7 +27,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { RoutesClient } from '../../clients/routes.client';
+import { Route, RoutesClient } from '../../clients/routes.client';
 
 @Component({
   selector: 'app-add-new-route',
@@ -55,15 +58,21 @@ export class AddNewRouteComponent implements OnInit {
   constructor(
     private dialogRef: MatDialogRef<FlightBookingComponent>,
     private airportService: AirportService,
-    private flightsService: FlightsService,
     private aircraftService: AircraftsService,
     private routeClient: RoutesClient,
-    fb: FormBuilder
+    fb: FormBuilder,
+    @Inject(MAT_DIALOG_DATA) public data?: Route
   ) {
+    const callsign = data?.callsign ?? '';
+    const departure = data?.departure ?? '';
+    const arrival = data?.arrival ?? '';
+
+    this.selectedAirframes = data?.allowedAirframes ?? [];
+
     this.routeForm = fb.group({
-      callsign: ['', Validators.required],
-      departure: ['', Validators.required],
-      arrival: ['', Validators.required],
+      callsign: [callsign, Validators.required],
+      departure: [departure, Validators.required],
+      arrival: [arrival, Validators.required],
     });
   }
 
@@ -104,6 +113,7 @@ export class AddNewRouteComponent implements OnInit {
     this.routeClient
       .addRoute({
         ...this.routeForm.value,
+        id: this.data?.id,
         allowedAirframes: this.selectedAirframes.map(value => ({
           id: value.id,
         })),
