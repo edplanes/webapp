@@ -103,7 +103,7 @@ export class FlightBookingComponent implements OnInit {
     const paddedMinutes = String(minutes).padStart(2, '0');
 
     const formatted = `${year}-${paddedMonth}-${paddedDay}T${paddedHours}:${paddedMinutes}`;
-    console.log(formatted);
+
     return formatted;
   }
 
@@ -190,7 +190,6 @@ export class FlightBookingComponent implements OnInit {
 
   selectFlightType(flightType: string) {
     this.flightType = flightType;
-    console.log(this.stepper!.steps.get(1)?.state, this.flightType);
 
     if (this.skipRouteSelection) {
       // Workaround until: https://github.com/angular/components/issues/17294

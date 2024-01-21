@@ -44,6 +44,12 @@ export class FlightsService {
       .pipe(catchError(this.handleError));
   }
 
+  fetchFlight(id: string) {
+    return this.flightsClient
+      .fetchFlightById(id)
+      .pipe(catchError(this.handleError));
+  }
+
   bookFlight(flight: FlightInput) {
     const userId = this.authService.authState.getValue()!.payload.id;
 

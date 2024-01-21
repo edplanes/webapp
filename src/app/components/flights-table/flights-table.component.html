@@ -68,7 +68,8 @@
         @if (row.status !== 'New') {
           <button
             mat-icon-button
-            aria-label="Example icon button with a vertical three dot icon">
+            aria-label="Example icon button with a vertical three dot icon"
+            [routerLink]="'/flights/summary/' + row.id">
             <mat-icon>info</mat-icon>
           </button>
         }

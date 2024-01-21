@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { LoginFormComponent } from '../../components/login-form/login-form.component';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { RequestData } from '../../../../app/simconnect/types';
 import { ElectronService } from '../../services/electron/electron.service';
@@ -8,7 +7,7 @@ import { JsonPipe } from '@angular/common';
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [LoginFormComponent, MatExpansionModule, JsonPipe],
+  imports: [MatExpansionModule, JsonPipe],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
 })
@@ -29,7 +28,6 @@ export class HomeComponent implements OnInit {
   }
 
   startFlight() {
-    console.log(!this.connected);
     if (!this.connected)
       this.electron.ipcRenderer.invoke('sim:connect', 'test');
     else this.electron.ipcRenderer.invoke('flight:close');

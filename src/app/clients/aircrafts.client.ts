@@ -57,4 +57,11 @@ export class AircraftsClient extends APIClient {
   fetchAirframes() {
     return this.http.get<Airframe[]>(`${this.apiServerBaseUrl}/airframes`);
   }
+
+  addAirframe(airframe: Airframe) {
+    return this.http.post<Airframe>(
+      `${this.apiServerBaseUrl}/airframes`,
+      airframe
+    );
+  }
 }

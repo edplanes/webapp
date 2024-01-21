@@ -1,0 +1,27 @@
+.summary-wrapper {
+  margin: 2rem;
+
+  & div {
+    width: 45vw;
+  }
+}
+
+.flight-date {
+  padding: 2rem;
+  font-size: larger;
+  font-weight: 900;
+}
+
+.airports {
+  padding: 1.5rem;
+  font-size: 1.5rem;
+  font-weight: 800;
+}
+
+.w-100 {
+  width: 100%;
+}
+
+.section {
+  margin: 1rem;
+}

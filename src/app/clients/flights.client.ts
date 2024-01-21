@@ -24,8 +24,8 @@ export interface Flight {
   departure: Airport;
   arrival: Airport;
   rating?: number;
-  events?: any;
-  penalties?: any;
+  log?: any[];
+  penalties?: any[];
 }
 
 @Injectable({
@@ -48,6 +48,10 @@ export class FlightsClient extends APIClient {
     return this.http.get<Flight[]>(
       `${this.apiServerBaseUrl}/users/${userId}/flights`
     );
+  }
+
+  fetchFlightById(id: string) {
+    return this.http.get<Flight>(`${this.apiServerBaseUrl}/flights/${id}`);
   }
 
   bookFlight(userId: string, flight: unknown) {

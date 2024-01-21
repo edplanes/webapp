@@ -1,0 +1,67 @@
+<div class="summary-wrapper" fxLayout="column" fxLayoutAlign="center center">
+  <div fxLayout="row" fxLayoutAlign="space-between center">
+    <h2>{{ flight?.callsign }}</h2>
+    <h3>(id: {{ flight?.id }})</h3>
+  </div>
+  <div fxLayout="row" fxLayoutAlign="space-between center">
+    <div fxLayout="column" class="section">
+      <span fxLayout="row" fxLayoutAlign="center center" class="flight-date">
+        <mat-icon>today</mat-icon>&nbsp;
+        <span>
+          {{ flight?.departureTime | date: 'dd MMMM YYY' }}
+        </span>
+      </span>
+      <span fxLayout="row" fxLayoutAlign="space-around center" class="airports">
+        <span>
+          {{ flight?.departure?.icao }}
+        </span>
+        <mat-icon>flight</mat-icon>
+        <span>
+          {{ flight?.arrival?.icao }}
+        </span>
+      </span>
+
+      <span fxLayout="row" fxLayoutAlign="space-around center">
+        <span fxLayout="column">
+          <span>Sch: {{ flight?.departureTime | date: 'hh:mm' : 'UTC' }}z</span>
+        </span>
+        <span fxLayout="column">
+          <mat-icon>schedule</mat-icon>
+        </span>
+        <span fxLayout="column">
+          <span>Sch: {{ flight?.arrivalTime | date: 'hh:mm' : 'UTC' }}z</span>
+        </span>
+      </span>
+    </div>
+    <div fxLayout="column" fxLayoutAlign="center center" class="section">
+      <h2>Pilot</h2>
+      <h4>{{ flight?.pilot?.username }}</h4>
+      <h2>Aircraft</h2>
+      <h4 fxLayout="column" fxLayoutAlign="center center">
+        <span>
+          {{ flight?.aircraft.airframe.icao }}
+          {{ flight?.aircraft.name }}
+        </span>
+        <small>{{ flight?.aircraft.airframe.name }}</small>
+      </h4>
+    </div>
+    <div fxLayout="column" fxLayoutAlign="center center" class="section">
+      <h2>Summary</h2>
+      <span fxLayout="row" fxLayoutAlign="space-between center" class="w-100">
+        <span>Duration:</span>
+        <span>{{ flight?.duration }}&nbsp;min</span>
+      </span>
+      <span fxLayout="row" fxLayoutAlign="space-between center" class="w-100">
+        <span>Fuel used:</span>
+        <span>{{ fuelUsed }}&nbsp;kgs</span>
+      </span>
+    </div>
+    <div fxLayout="column" fxLayoutAlign="center center" class="section">
+      <h2>Report</h2>
+      <span fxLayout="row" fxLayoutAlign="space-between center" class="w-100">
+        <span>Fuel used:</span>
+        <span>{{ fuelUsed }}&nbsp;kgs</span>
+      </span>
+    </div>
+  </div>
+</div>

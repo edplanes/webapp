@@ -88,7 +88,6 @@ export class AppComponent implements OnInit, OnDestroy {
     });
     this.flightLogger.loggerState.asObservable().subscribe(value => {
       this.displayedPaths = this.getMenuPaths();
-      console.log(value);
     });
   }
 

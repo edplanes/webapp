@@ -70,7 +70,9 @@
           </button>
         } @else if (!isNextFlight && currentFlightState.isClosedOrDeleted) {
           <div>
-            <button mat-raised-button [routerLink]="'/flights/' + flight.id">
+            <button
+              mat-raised-button
+              [routerLink]="'/flights/summary/' + flight.id">
               Show flight log
             </button>
           </div>

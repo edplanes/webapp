@@ -19,7 +19,7 @@ import { DatePipe } from '@angular/common';
 import { MatDialog } from '@angular/material/dialog';
 import { MessageDialogComponent } from '../message-dialog/message-dialog.component';
 import { LoggerService } from '../../services/logger/logger.service';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { ElectronService } from '../../services/electron/electron.service';
 
 @Component({
@@ -36,6 +36,7 @@ import { ElectronService } from '../../services/electron/electron.service';
     MatDividerModule,
     MatIconModule,
     DatePipe,
+    RouterModule,
   ],
   templateUrl: './flights-table.component.html',
   styleUrl: './flights-table.component.scss',

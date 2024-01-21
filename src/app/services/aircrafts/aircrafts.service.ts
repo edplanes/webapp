@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { AircraftsClient } from '../../clients/aircrafts.client';
+import { AircraftsClient, Airframe } from '../../clients/aircrafts.client';
 
 @Injectable({
   providedIn: 'root',
@@ -23,5 +23,7 @@ export class AircraftsService {
     return this.aircraftClient.searchAirframe(search);
   }
 
-  addAirframe();
+  addAirframe(airframe: Airframe) {
+    return this.aircraftClient.addAirframe(airframe);
+  }
 }

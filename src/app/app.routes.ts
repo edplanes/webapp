@@ -11,6 +11,7 @@ import { RoutesComponent } from './pages/routes/routes.component';
 import { AircraftsComponent } from './pages/aircrafts/aircrafts.component';
 import { PilotsComponent } from './pages/pilots/pilots.component';
 import { AirframesComponent } from './pages/airframes/airframes.component';
+import { FlightSummaryComponent } from './pages/flight-summary/flight-summary.component';
 
 export const routes: Routes = [
   {
@@ -69,6 +70,11 @@ export const routes: Routes = [
   {
     path: 'airframes',
     component: AirframesComponent,
+    canActivate: [authGuard],
+  },
+  {
+    path: 'flights/summary/:id',
+    component: FlightSummaryComponent,
     canActivate: [authGuard],
   },
 ];
