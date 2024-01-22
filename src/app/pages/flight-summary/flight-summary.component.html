@@ -56,12 +56,42 @@
         <span>{{ fuelUsed }}&nbsp;kgs</span>
       </span>
     </div>
-    <div fxLayout="column" fxLayoutAlign="center center" class="section">
-      <h2>Report</h2>
-      <span fxLayout="row" fxLayoutAlign="space-between center" class="w-100">
-        <span>Fuel used:</span>
-        <span>{{ fuelUsed }}&nbsp;kgs</span>
-      </span>
+  </div>
+  <div fxLayout="column" fxLayoutAlign="center center">
+    <h2>Report</h2>
+    @for (penalty of penalties; track $index) {
+      <div fxLayout="column" class="report-entry">
+        <div fxLayout="row" fxLayoutAlign="space-around center" fxFill>
+          <span>{{ penalty.name }}</span>
+          <span>{{ penalty.value }}</span>
+        </div>
+      </div>
+    }
+    <div fxLayout="column" fxLayoutAlign="center center" class="report-entry">
+      <h3>Landing Report</h3>
+
+      <div fxLayout="row" fxLayoutAlign="space-around center" fxFill>
+        <span>Bounced: </span>
+        <span>{{ landingResult?.bounceCounter }}</span>
+      </div>
+      <div fxLayout="row" fxLayoutAlign="space-around center" fxFill>
+        <span>Average touchdown: </span>
+        <span>{{ landingResult?.averageTouchdownRate }}</span>
+      </div>
+      <div fxLayout="row" fxLayoutAlign="space-around center" fxFill>
+        <span>Average GForce: </span>
+        <span>{{ landingResult?.averageGForce }}</span>
+      </div>
     </div>
   </div>
+  <h2>Full Log</h2>
+  @for (event of events; track $index) {
+    <div fxLayout="column" class="report-entry">
+      <div fxLayout="row" fxLayoutAlign="space-between center" fxFill>
+        <span>{{ event.eventState.timestamp | date: 'hh:mm' }}</span>
+        <span>{{ event.name }}</span>
+        <span></span>
+      </div>
+    </div>
+  }
 </div>

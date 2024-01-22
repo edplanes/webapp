@@ -8,6 +8,7 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { MatIconModule } from '@angular/material/icon';
 import { JsonPipe } from '@angular/common';
 import { MatDividerModule } from '@angular/material/divider';
+import { Subscription, timer } from 'rxjs';
 
 @Component({
   selector: 'app-logger',
@@ -27,6 +28,7 @@ export class LoggerComponent implements OnInit {
   flightRunning: boolean = false;
   lastSimData: unknown;
   events: { name: string; entry: unknown }[] = [];
+  subscription?: Subscription;
 
   get flightId() {
     return this.loggerService.loggerState.getValue()?.flightId;
@@ -55,16 +57,16 @@ export class LoggerComponent implements OnInit {
       this.lastSimData = JSON.parse(data);
     });
 
-    this.electronService.ipcRenderer.on('app:event:detected', (_, data) => {
-      this.events = JSON.parse(data);
-      this.events = this.events.filter(
-        (_, index) => this.events.length - index < 50
-      );
+    this.subscription = timer(0, 30000).subscribe(() => {
+      this.loggerService.fetchEvents(this.flightId).subscribe(events => {
+        this.events = events.filter(event => event.name !== 'position_updated');
+      });
     });
   }
 
   close() {
-    this.electronService.ipcRenderer.invoke('flight:close');
+    this.loggerService.closeFlight(this.flightId);
+    this.subscription?.unsubscribe();
     this.router.navigateByUrl('/user');
   }
 }

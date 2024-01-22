@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { AuthService } from '../auth/auth.service';
 import { BehaviorSubject } from 'rxjs';
 import type { RecvOpen } from 'node-simconnect';
+import { HttpClient } from '@angular/common/http';
 
 export type LoggerState = {
   flightId: string;
@@ -32,6 +33,7 @@ export class LoggerService {
   constructor(
     private authService: AuthService,
     private electronService: ElectronService,
+    private http: HttpClient,
     private router: Router
   ) {
     electronService.ipcRenderer?.on(
@@ -68,7 +70,17 @@ export class LoggerService {
     this.loggerState.next({ flightId: id, connected: false });
   }
 
-  closeFlight() {
+  closeFlight(id: string) {
     this.electronService.ipcRenderer.invoke('flight:close');
+    this.http.delete(`http://localhost:3000/flights/${id}`).subscribe({
+      next: console.log,
+      error: console.error,
+    });
+  }
+
+  fetchEvents(id: string) {
+    return this.http.get<{ name: string; entry: unknown }[]>(
+      `http://localhost:3000/events/${id}`
+    );
   }
 }

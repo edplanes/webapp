@@ -71,10 +71,6 @@ try {
         win?.webContents.send('sim:dataReceived', JSON.stringify(data));
       });
 
-      eventer.on('app:event:detected', data => {
-        win?.webContents.send('app:event:detected', JSON.stringify(data));
-      });
-
       eventer.on('flight:close', () => {
         logger.info('Closing flight...');
         win?.webContents.send('flight:close');
@@ -134,9 +130,19 @@ try {
         }
       }
 
-      socket.on('app:event:detected', event => {
-        eventer.emit('app:event:detected', event);
-      });
+      // socket.on('app:event:detected', (events: { name: string }[]) => {
+      //   // Skip position events as they do not provide valid info for user.
+      //   if (events[events.length - 1].name === 'position_updated') return;
+
+      //   const filteredEvents = events.filter(
+      //     event => event.name !== 'position_updated'
+      //   );
+
+      //   win?.webContents.send(
+      //     'app:event:detected',
+      //     JSON.stringify(filteredEvents)
+      //   );
+      // });
       socket.emit('sim:data', data);
     });
 
@@ -144,11 +150,6 @@ try {
       logger.info('Closing reporting server connection...');
       socket?.disconnect();
     });
-
-    // eventer.on('flight:closed', () => {
-    //   logger.info('CLosing flight...');
-    //   ws?.close();
-    // });
   }
 } catch (e) {
   // Catch Error
