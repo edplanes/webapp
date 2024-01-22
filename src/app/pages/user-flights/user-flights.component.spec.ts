@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { AirframeTableComponent } from './airframe-table.component';
+import { UserFlightsComponent } from './user-flights.component';
 
-describe('AirframeTableComponent', () => {
-  let component: AirframeTableComponent;
-  let fixture: ComponentFixture<AirframeTableComponent>;
+describe('UserFlightsComponent', () => {
+  let component: UserFlightsComponent;
+  let fixture: ComponentFixture<UserFlightsComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [AirframeTableComponent]
+      imports: [UserFlightsComponent]
     })
     .compileComponents();
     
-    fixture = TestBed.createComponent(AirframeTableComponent);
+    fixture = TestBed.createComponent(UserFlightsComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

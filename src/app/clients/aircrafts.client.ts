@@ -2,33 +2,38 @@ import { Injectable } from '@angular/core';
 import { APIClient } from '../shared/APIClient';
 
 export interface Airframe {
-  id: string;
+  id?: string;
   icao: string;
   name: string;
   purpose: string;
   category: string;
   size: string;
-  limitations: {
-    weights: {
-      maximumTakeoffWeight: number;
-      maximumLandingWeight: number;
-      operationaLEmptyWeight: number;
-      maximumZeroFuelWeight: number;
-      maximumFuelOnBoard: number;
-    };
-  };
-  defaults: {
-    cruiseTAS: number;
-  };
+  limitations: AirframeLimitations;
+  defaults: AirframeDefaults;
 }
 
-export interface Aircraft {
-  name: string;
-  airframe: Airframe;
-  customWeights: {
+export type AirframeDefaults = {
+  cruiseTAS: number;
+};
+
+export type AirframeLimitations = {
+  weights: {
     maximumTakeoffWeight: number;
     maximumLandingWeight: number;
-    operationaLEmptyWeight: number;
+    operationalEmptyWeight: number;
+    maximumZeroFuelWeight: number;
+    maximumFuelOnBoard: number;
+  };
+};
+
+export interface Aircraft {
+  id?: string;
+  name: string;
+  airframe: Airframe;
+  customWeights?: {
+    maximumTakeoffWeight: number;
+    maximumLandingWeight: number;
+    operationalEmptyWeight: number;
     maximumZeroFuelWeight: number;
     maximumFuelOnBoard: number;
   };
@@ -48,6 +53,24 @@ export class AircraftsClient extends APIClient {
     return this.http.get<Aircraft[]>(`${this.apiServerBaseUrl}/aircrafts`);
   }
 
+  addAircraft(aircraft: Aircraft) {
+    return this.http.post<Aircraft>(
+      `${this.apiServerBaseUrl}/aircrafts`,
+      aircraft
+    );
+  }
+
+  updateAircraft(aircraft: Aircraft) {
+    return this.http.put<Airframe>(
+      `${this.apiServerBaseUrl}/aircraft/${aircraft.id}`,
+      aircraft
+    );
+  }
+
+  deleteAircraft(id: string) {
+    return this.http.delete(`${this.apiServerBaseUrl}/aircrafts/${id}`);
+  }
+
   searchAirframe(value: string) {
     return this.http.get<Airframe[]>(
       `${this.apiServerBaseUrl}/airframes?search=${value}`
@@ -63,5 +86,16 @@ export class AircraftsClient extends APIClient {
       `${this.apiServerBaseUrl}/airframes`,
       airframe
     );
+  }
+
+  updateAirframe(airframe: Airframe) {
+    return this.http.put<Airframe>(
+      `${this.apiServerBaseUrl}/airframes/${airframe.id}`,
+      airframe
+    );
+  }
+
+  deleteAirframe(id: string) {
+    return this.http.delete(`${this.apiServerBaseUrl}/airframes/${id}`);
   }
 }

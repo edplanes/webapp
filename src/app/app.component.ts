@@ -86,7 +86,7 @@ export class AppComponent implements OnInit, OnDestroy {
     this.authService.isLoggedIn().subscribe(() => {
       this.displayedPaths = this.getMenuPaths();
     });
-    this.flightLogger.loggerState.asObservable().subscribe(value => {
+    this.flightLogger.loggerState.asObservable().subscribe(() => {
       this.displayedPaths = this.getMenuPaths();
     });
   }
@@ -170,6 +170,10 @@ export class AppComponent implements OnInit, OnDestroy {
       paths.push({
         path: `/aircrafts`,
         displayName: 'Aircrafts',
+      });
+      paths.push({
+        path: `/pilots`,
+        displayName: 'Pilots',
       });
     }
 

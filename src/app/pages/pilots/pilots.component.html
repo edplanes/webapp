@@ -1,1 +1,65 @@
-<p>pilots works!</p>
+<div fxLayout="column" fxLayoutAlign="center center" class="pilots-wrapper">
+  <nav fxLayout="row" fxLayoutAlign="space-evenly center">
+    <mat-form-field>
+      <mat-label>Filter</mat-label>
+      <input
+        matInput
+        (keyup)="applyFilter($event)"
+        placeholder="Ex. Mia"
+        #input />
+    </mat-form-field>
+  </nav>
+
+  <div class="mat-elevation-z8">
+    <table mat-table [dataSource]="pilots" matSort>
+      <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>ID</th>
+        <td mat-cell *matCellDef="let row">{{ row.pilotId }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
+        <td mat-cell *matCellDef="let row">{{ row.pilotName }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="averageRating">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
+          Average Rating
+        </th>
+        <td mat-cell *matCellDef="let row">{{ row.averageRating }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="aircraft">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
+          Most Flown Aircraft
+        </th>
+        <td mat-cell *matCellDef="let row">{{ row.mostFlownAircraft }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="pireps">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>PIREPs</th>
+        <td mat-cell *matCellDef="let row">{{ row.pireps }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="details">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Details</th>
+        <td mat-cell *matCellDef="let row">
+          <button
+            mat-icon-button
+            [routerLink]="'/users/' + row.pilotId + '/flights'">
+            <mat-icon>info</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+
+      <tr class="mat-row" *matNoDataRow>
+        <td class="mat-cell" colspan="4">
+          No data matching the filter "{{ input.value }}"
+        </td>
+      </tr>
+    </table>
+  </div>
+</div>

@@ -7,14 +7,14 @@ import {
   MatTreeFlattener,
   MatTreeModule,
 } from '@angular/material/tree';
-import { AirframeLimitations } from '../../clients/aircrafts.client';
+import { AirframeDefaults } from '../../clients/aircrafts.client';
 import { MatIconModule } from '@angular/material/icon';
 import { FlexLayoutModule } from '@angular/flex-layout';
 
-type LimitationsNode = {
+type DefaultsNode = {
   name: string;
   value?: string;
-  children?: LimitationsNode[];
+  children?: DefaultsNode[];
 };
 
 type FlatNode = {
@@ -25,14 +25,14 @@ type FlatNode = {
 };
 
 @Component({
-  selector: 'app-limitations-dialog',
+  selector: 'app-defaults-dialog',
   standalone: true,
   imports: [MatTreeModule, MatButtonModule, MatIconModule, FlexLayoutModule],
-  templateUrl: './limitations-dialog.component.html',
-  styleUrl: './limitations-dialog.component.scss',
+  templateUrl: './defaults-dialog.component.html',
+  styleUrl: './defaults-dialog.component.scss',
 })
-export class LimitationsDialogComponent {
-  private _transformer = (node: LimitationsNode, level: number): FlatNode => ({
+export class DefaultsDialogComponent {
+  private _transformer = (node: DefaultsNode, level: number): FlatNode => ({
     expandable: !!node.children && node.children.length > 0,
     name: node.name,
     level: level,
@@ -53,38 +53,17 @@ export class LimitationsDialogComponent {
 
   datasource = new MatTreeFlatDataSource(this.treeControl, this.treeFlattener);
 
-  constructor(@Inject(MAT_DIALOG_DATA) data: AirframeLimitations) {
+  constructor(@Inject(MAT_DIALOG_DATA) data: AirframeDefaults) {
     this.datasource.data = this.toLimitiationNodes(data);
   }
 
   hasChild = (_: number, node: FlatNode) => node.expandable;
 
-  private toLimitiationNodes(data: AirframeLimitations): LimitationsNode[] {
+  private toLimitiationNodes(data: AirframeDefaults): DefaultsNode[] {
     return [
       {
-        name: 'weights',
-        children: [
-          {
-            name: 'Maximum Fuel On Board',
-            value: data.weights.maximumFuelOnBoard.toString(),
-          },
-          {
-            name: 'Maximum Landing Weight',
-            value: data.weights.maximumLandingWeight.toString(),
-          },
-          {
-            name: 'Maximum Takeoff Weight',
-            value: data.weights.maximumTakeoffWeight.toString(),
-          },
-          {
-            name: 'Maximum Zero Fuel Weight',
-            value: data.weights.maximumZeroFuelWeight.toString(),
-          },
-          {
-            name: 'Empty Weight',
-            value: data.weights.operationalEmptyWeight.toString(),
-          },
-        ],
+        name: 'Cruise True Airspeed',
+        value: data.cruiseTAS.toString(),
       },
     ];
   }

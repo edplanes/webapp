@@ -1,0 +1,71 @@
+<form
+  [formGroup]="aircraftForm"
+  fxLayout="column"
+  fxLayoutAlign="center center">
+  <h2>{{ data ? 'Edit' : 'Add' }} aircraft</h2>
+  <mat-form-field>
+    <mat-label>Name</mat-label>
+    <input matInput formControlName="name" placeholder="Ex. Boeing" />
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>Airframe</mat-label>
+    <input
+      type="text"
+      matInput
+      formControlName="airframe"
+      [matAutocomplete]="auto" />
+    <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayAirframe">
+      @for (airframe of filteredAirframes; track airframe.icao) {
+        <mat-option [value]="airframe">{{
+          displayAirframe(airframe)
+        }}</mat-option>
+      }
+    </mat-autocomplete>
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>Maximum Fuel On Board (kgs)</mat-label>
+    <input
+      matInput
+      type="number"
+      formControlName="maxFuelOnBoard"
+      placeholder="Ex. 151611" />
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>Maximum Landing Weight (kgs)</mat-label>
+    <input
+      matInput
+      type="number"
+      formControlName="maxLandingWeight"
+      placeholder="Ex. 151611" />
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>Maximum Takeoff Weight (kgs)</mat-label>
+    <input
+      matInput
+      type="number"
+      formControlName="maxTakeoffWeight"
+      placeholder="Ex. 151611" />
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>Maximum Zero Fuel Weight (kgs)</mat-label>
+    <input
+      matInput
+      type="number"
+      formControlName="maxZeroFuelWeight"
+      placeholder="Ex. 151611" />
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>Operational Empty Weight (kgs)</mat-label>
+    <input
+      matInput
+      type="number"
+      formControlName="emptyWeight"
+      placeholder="Ex. 151611" />
+  </mat-form-field>
+  <div fxLayout fxLAyoutAlign="space-between center">
+    <button mat-dialog-close mat-stroked-button>Close</button>
+    <button mat-raised-button (click)="onSubmit()" color="accent">
+      Save Route
+    </button>
+  </div>
+</form>

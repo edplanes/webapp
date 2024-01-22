@@ -58,7 +58,11 @@
     </div>
   </div>
   <div fxLayout="column" fxLayoutAlign="center center">
-    <h2>Report</h2>
+    <div fxLayout="row" fxLayoutAlign="space-between center" fxFill>
+      <span></span>
+      <h2>Report</h2>
+      <h3 class="rating">{{ flight?.rating }}</h3>
+    </div>
     @for (penalty of penalties; track $index) {
       <div fxLayout="column" class="report-entry">
         <div fxLayout="row" fxLayoutAlign="space-around center" fxFill>
@@ -71,16 +75,26 @@
       <h3>Landing Report</h3>
 
       <div fxLayout="row" fxLayoutAlign="space-around center" fxFill>
-        <span>Bounced: </span>
-        <span>{{ landingResult?.bounceCounter }}</span>
-      </div>
-      <div fxLayout="row" fxLayoutAlign="space-around center" fxFill>
-        <span>Average touchdown: </span>
-        <span>{{ landingResult?.averageTouchdownRate }}</span>
-      </div>
-      <div fxLayout="row" fxLayoutAlign="space-around center" fxFill>
-        <span>Average GForce: </span>
-        <span>{{ landingResult?.averageGForce }}</span>
+        <div fxLayout="column" fxLayoutAlign="center center">
+          <span>Bounced: </span>
+          <span>Average touchdown: </span>
+          <span>Average GForce: </span>
+        </div>
+        <div fxLayout="column" fxLayoutAlign="center center">
+          <span>{{ landingResult?.bounceCounter }}</span>
+          @if (landingResult?.averageTouchdownRate) {
+            <span>{{
+              landingResult?.averageTouchdownRate | number: '1.0-2'
+            }}</span>
+          } @else {
+            <span>Unknown</span>
+          }
+          @if (landingResult?.averageGForce) {
+            <span>{{ landingResult?.averageGForce | number: '1.0-2' }}</span>
+          } @else {
+            <span>Unknown</span>
+          }
+        </div>
       </div>
     </div>
   </div>

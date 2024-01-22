@@ -1,1 +1,80 @@
-<app-aircraft-table></app-aircraft-table>
+<div fxLayout="column" fxLayoutAlign="center center" class="aircrafts-wrapper">
+  <nav fxLayout="row" fxLayoutAlign="space-evenly center">
+    <mat-form-field>
+      <mat-label>Filter</mat-label>
+      <input
+        matInput
+        (keyup)="applyFilter($event)"
+        placeholder="Ex. Mia"
+        #input />
+    </mat-form-field>
+    <button mat-raised-button (click)="openAddDialog()">Add aircraft</button>
+  </nav>
+  <div class="mat-elevation-z8">
+    <table mat-table [dataSource]="filteredAircrafts" matSort>
+      <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>ID</th>
+        <td mat-cell *matCellDef="let row">{{ row.id }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="icao">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Airframe</th>
+        <td mat-cell *matCellDef="let row">{{ row.airframe.icao }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
+        <td mat-cell *matCellDef="let row">{{ row.name }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="customWeights">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
+          Custom weights
+        </th>
+        <td mat-cell *matCellDef="let row">
+          @if (row.customWeights) {
+            <button
+              (click)="openShowLimitations(row)"
+              mat-icon-button
+              aria-label="Example icon button with a vertical three dot icon">
+              <mat-icon>info</mat-icon>
+            </button>
+          }
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="edit">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Edit</th>
+        <td mat-cell *matCellDef="let row">
+          <button
+            (click)="openEditDialog(row)"
+            mat-icon-button
+            aria-label="Example icon button with a vertical three dot icon">
+            <mat-icon>edit</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="delete">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Edit</th>
+        <td mat-cell *matCellDef="let row">
+          <button
+            (click)="deleteAircraft(row.id)"
+            mat-icon-button
+            aria-label="Example icon button with a vertical three dot icon">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+
+      <tr class="mat-row" *matNoDataRow>
+        <td class="mat-cell" colspan="4">
+          No data matching the filter "{{ input.value }}"
+        </td>
+      </tr>
+    </table>
+  </div>
+</div>

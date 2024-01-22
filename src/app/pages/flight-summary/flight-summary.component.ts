@@ -3,13 +3,20 @@ import { FlexLayoutModule } from '@angular/flex-layout';
 import { FlightsService } from '../../services/flights/flights.service';
 import { Flight } from '../../clients/flights.client';
 import { ActivatedRoute } from '@angular/router';
-import { DatePipe } from '@angular/common';
+import { DatePipe, DecimalPipe } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-flight-summary',
   standalone: true,
-  imports: [FlexLayoutModule, DatePipe, MatIconModule],
+  imports: [
+    FlexLayoutModule,
+    DatePipe,
+    MatIconModule,
+    MatButtonModule,
+    DecimalPipe,
+  ],
   templateUrl: './flight-summary.component.html',
   styleUrl: './flight-summary.component.scss',
 })
