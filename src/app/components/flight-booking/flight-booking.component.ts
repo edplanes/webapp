@@ -146,8 +146,8 @@ export class FlightBookingComponent implements OnInit {
             const routeAirframes = this.selectedRoute.allowedAirframes.map(
               aiframe => aiframe.icao
             );
-            this.filteredAircrafts = aircraft.filter(
-              aircraft => aircraft.airframe.icao in routeAirframes
+            this.filteredAircrafts = aircraft.filter(aircraft =>
+              routeAirframes.includes(aircraft.airframe.icao)
             );
           });
         typeof value == 'object' && this.updateFlightDuration();
